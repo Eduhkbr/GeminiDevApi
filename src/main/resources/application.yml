@@ -1,6 +1,6 @@
 gemini:
   api:
-    base-url: https://generativelanguage.googleapis.com/v1beta/models
+    base-url: https://generativelanguage.googleapis.com/v1beta
     key: ${GEMINI_API_KEY}
     model-name: gemini-2.5-flash-preview-05-20
 
