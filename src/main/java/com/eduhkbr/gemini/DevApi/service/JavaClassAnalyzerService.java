@@ -10,7 +10,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
- * Serviço responsável por analisar classes Java.
+ * Serviço responsável por analisar classes Java e gerar documentação e testes automáticos
+ * utilizando LLM (Large Language Model).
+ * <p>
+ * Aplica templates configuráveis para gerar prompts e processa as respostas do modelo.
+ * </p>
  */
 @Service
 public class JavaClassAnalyzerService {
@@ -22,14 +26,18 @@ public class JavaClassAnalyzerService {
   @Value("${analysis.prompt.tests}")
   private String testTemplate;
 
+  /**
+   * Construtor com injeção de dependência do client LLM.
+   * @param llm client para comunicação com modelo generativo
+   */
   public JavaClassAnalyzerService(LlmClient llm) {
     this.llm = llm;
   }
 
   /**
-   * Analisa uma classe Java e retorna o resultado da geração.
+   * Analisa uma classe Java e retorna o resultado da geração de documentação e testes.
    * @param javaClass classe Java a ser analisada
-   * @return resultado da geração
+   * @return resultado da geração (documentação e esqueleto de testes)
    */
   public GenerationResult analyze(JavaClass javaClass) {
     logger.info("Analisando classe: {}", javaClass.getName());
