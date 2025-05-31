@@ -1,0 +1,7 @@
+spring:
+  profiles: prod
+  application:
+    name: DevApi
+logging:
+  level:
+    root: INFO

@@ -1,0 +1,50 @@
+gemini:
+  api:
+    base-url: https://generativelanguage.googleapis.com/v1beta/models
+    key: ${GEMINI_API_KEY}
+    model-name: gemini-2.5-flash-preview-05-20
+
+analysis:
+  prompt:
+    documentation: |
+      Você é um gerador de documentação técnica experiente.
+      Gere uma seção de README.md clara, concisa e útil para a seguinte classe Java.
+      A documentação deve ser formatada em Markdown.
+      ----------------------------------------------------
+      Nome da classe: %s
+
+      Código-fonte:
+      ```java
+      %s
+      ```
+      ----------------------------------------------------
+      A saída deve conter:
+      1. Descrição geral da classe: Qual o seu propósito principal e responsabilidades.
+      2. Principais Funcionalidades: Detalhe os métodos públicos mais importantes e o que eles fazem.
+      3. Como usar: Forneça um ou dois exemplos curtos de como instanciar e usar a classe ou seus métodos principais.
+      4. Parâmetros de Métodos Chave: Se houver métodos com parâmetros complexos ou importantes, explique-os.
+      5. Comportamentos Esperados e Tratamento de Erros: Mencione o comportamento normal e como a classe lida com situações de erro (exceções comuns).
+
+    tests: |
+      Você é um engenheiro de QA especialista em testes unitários com JUnit 5.
+      Para a classe Java fornecida abaixo, gere um esqueleto de classe de testes JUnit 5.
+      ----------------------------------------------------
+      Nome da classe: %s
+
+      Código-fonte:
+      ```java
+      %s
+      ```
+      ----------------------------------------------------
+      A saída deve conter:
+      1. Uma classe de teste Java com o nome `%sTest.java`.
+      2. Importações necessárias do JUnit 5 (org.junit.jupiter.api.*).
+      3. Um método de teste com a anotação @Test para cada método público da classe original.
+         - Use nomes de método descritivos para os testes (ex: `testNomeDoMetodo_QuandoCondicao_DeveRetornarResultadoEsperado`).
+      4. Dentro de cada método de teste:
+         - Inclua comentários // TODO: Arrange, // TODO: Act, // TODO: Assert.
+         - Sugira cenários de teste básicos (caminho feliz).
+         - Se aplicável, sugira cenários para testar o tratamento de exceções (usando assertThrows).
+         - Inclua comentários // TODO: Mockar dependências (se a classe tiver dependências injetadas que precisariam ser mockadas).
+      5. Não implemente a lógica completa dos testes, apenas o esqueleto e as sugestões.
+      A saída deve ser apenas o código Java da classe de teste.
