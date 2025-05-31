@@ -108,13 +108,13 @@ jobs:
       - name: Build Image
         run: |
           docker build \
-            -t ${{ vars.GOOGLE_ARTIFACT }}/${{ vars.GOOGLE_PROJECT_ID }}/${{ vars.GOOGLE_REPONAME }}/${{ vars.GOOGLE_MYAPP }}:latest \
+            -t ${{ vars.GOOGLE_ARTIFACT }}/${{ secrets.GOOGLE_PROJECT_ID }}/${{ vars.GOOGLE_REPONAME }}/${{ vars.GOOGLE_MYAPP }}:latest \
             .
 
       - name: Push Image
         run: |
           docker push \
-            ${{ vars.GOOGLE_ARTIFACT }}/${{ vars.GOOGLE_PROJECT_ID }}/${{ vars.GOOGLE_REPONAME }}/${{ vars.GOOGLE_MYAPP }}:latest
+            ${{ vars.GOOGLE_ARTIFACT }}/${{ secrets.GOOGLE_PROJECT_ID }}/${{ vars.GOOGLE_REPONAME }}/${{ vars.GOOGLE_MYAPP }}:latest
 
   deploy:
     name: Deploy to Cloud Run
