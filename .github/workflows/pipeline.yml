@@ -54,6 +54,9 @@ jobs:
       - name: Run Maven Tests
         run: mvn test
 
+      - name: Gerar relatório JaCoCo (CSV)
+        run: mvn jacoco:report
+
       - name: Generate JaCoCo Badge
         id: jacoco
         uses: cicirello/jacoco-badge-generator@v2.11.0
