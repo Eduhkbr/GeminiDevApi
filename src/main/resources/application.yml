@@ -37,7 +37,7 @@ analysis:
       ```
       ----------------------------------------------------
       A saída deve conter:
-      1. Uma classe de teste Java com o nome `%sTest.java`.
+      1. Uma classe de teste Java com o nome <NOME_DA_CLASSE>Test.java.
       2. Importações necessárias do JUnit 5 (org.junit.jupiter.api.*).
       3. Um método de teste com a anotação @Test para cada método público da classe original.
          - Use nomes de método descritivos para os testes (ex: `testNomeDoMetodo_QuandoCondicao_DeveRetornarResultadoEsperado`).

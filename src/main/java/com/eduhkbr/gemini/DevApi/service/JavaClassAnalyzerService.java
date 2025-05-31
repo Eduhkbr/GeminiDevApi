@@ -3,6 +3,7 @@ package com.eduhkbr.gemini.DevApi.service;
 import com.eduhkbr.gemini.DevApi.llm.LlmClient;
 import com.eduhkbr.gemini.DevApi.model.GenerationResult;
 import com.eduhkbr.gemini.DevApi.model.JavaClass;
+import java.util.MissingFormatArgumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,12 +33,28 @@ public class JavaClassAnalyzerService {
    */
   public GenerationResult analyze(JavaClass javaClass) {
     logger.info("Analisando classe: {}", javaClass.getName());
-    String promptDoc  = String.format(docTemplate, javaClass.getName(), javaClass.getSourceCode());
-    String documentation = llm.sendPrompt(promptDoc);
-
-    String promptTest = String.format(testTemplate, javaClass.getName(), javaClass.getSourceCode());
-    String tests = llm.sendPrompt(promptTest);
-
+    String promptDoc = null;
+    String documentation = null;
+    String promptTest = null;
+    String tests = null;
+    try {
+      logger.info("Template de documentação: {}", docTemplate);
+      logger.info("Argumentos: nome={}, sourceCode={} ", javaClass.getName(), javaClass.getSourceCode());
+      promptDoc = String.format(docTemplate, javaClass.getName(), javaClass.getSourceCode());
+      documentation = llm.sendPrompt(promptDoc);
+    } catch (MissingFormatArgumentException e) {
+      logger.error("Erro de formatação no template de documentação: {} | Template: {} | Args: nome={}, sourceCode={}", e.getMessage(), docTemplate, javaClass.getName(), javaClass.getSourceCode(), e);
+      documentation = "[ERRO] Falha ao gerar documentação: template inválido ou argumentos insuficientes.";
+    }
+    try {
+      logger.info("Template de testes: {}", testTemplate);
+      logger.info("Argumentos: nome={}, sourceCode={} ", javaClass.getName(), javaClass.getSourceCode());
+      promptTest = String.format(testTemplate, javaClass.getName(), javaClass.getSourceCode());
+      tests = llm.sendPrompt(promptTest);
+    } catch (MissingFormatArgumentException e) {
+      logger.error("Erro de formatação no template de testes: {} | Template: {} | Args: nome={}, sourceCode={}", e.getMessage(), testTemplate, javaClass.getName(), javaClass.getSourceCode(), e);
+      tests = "[ERRO] Falha ao gerar testes: template inválido ou argumentos insuficientes.";
+    }
     return new GenerationResult(documentation, tests);
   }
 }
