@@ -3,6 +3,11 @@ package com.eduhkbr.gemini.DevApi.service;
 import com.eduhkbr.gemini.DevApi.llm.LlmClient;
 import com.eduhkbr.gemini.DevApi.model.GenerationResult;
 import com.eduhkbr.gemini.DevApi.model.JavaClass;
+import com.eduhkbr.gemini.DevApi.model.GenerationCache;
+import com.eduhkbr.gemini.DevApi.repository.GenerationCacheRepository;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.transaction.annotation.Transactional;
+import org.apache.commons.codec.digest.DigestUtils;
 import java.util.MissingFormatArgumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +26,7 @@ public class JavaClassAnalyzerService {
 
   private static final Logger logger = LoggerFactory.getLogger(JavaClassAnalyzerService.class);
   private final LlmClient llm;
+  private final GenerationCacheRepository cacheRepository;
   @Value("${analysis.prompt.documentation}")
   private String docTemplate;
   @Value("${analysis.prompt.tests}")
@@ -29,18 +35,27 @@ public class JavaClassAnalyzerService {
   /**
    * Construtor com injeção de dependência do client LLM.
    * @param llm client para comunicação com modelo generativo
+   * @param cacheRepository repositório para cache de gerações
    */
-  public JavaClassAnalyzerService(LlmClient llm) {
+  public JavaClassAnalyzerService(LlmClient llm, GenerationCacheRepository cacheRepository) {
     this.llm = llm;
+    this.cacheRepository = cacheRepository;
   }
 
   /**
-   * Analisa uma classe Java e retorna o resultado da geração de documentação e testes.
-   * @param javaClass classe Java a ser analisada
-   * @return resultado da geração (documentação e esqueleto de testes)
+   * Analisa uma classe Java, utilizando cache e persistência para evitar chamadas desnecessárias à IA.
    */
+  @Cacheable(value = "generationResult", key = "#javaClass.name + '-' + T(org.apache.commons.codec.digest.DigestUtils).sha256Hex(#javaClass.sourceCode)")
+  @Transactional
   public GenerationResult analyze(JavaClass javaClass) {
-    logger.info("Analisando classe: {}", javaClass.getName());
+    String key = javaClass.getName() + "-" + DigestUtils.sha256Hex(javaClass.getSourceCode());
+    // 1. Busca no banco
+    GenerationCache cached = cacheRepository.findByHash(key).orElse(null);
+    if (cached != null) {
+      return new GenerationResult(cached.getResult(), null); // Ajuste conforme estrutura
+    }
+    // 2. Chama IA
+    logger.info("Analisando classe: {} (cache miss)", javaClass.getName());
     String promptDoc = null;
     String documentation = null;
     String promptTest = null;
@@ -63,6 +78,14 @@ public class JavaClassAnalyzerService {
       logger.error("Erro de formatação no template de testes: {} | Template: {} | Args: nome={}, sourceCode={}", e.getMessage(), testTemplate, javaClass.getName(), javaClass.getSourceCode(), e);
       tests = "[ERRO] Falha ao gerar testes: template inválido ou argumentos insuficientes.";
     }
-    return new GenerationResult(documentation, tests);
+    GenerationResult result = new GenerationResult(documentation, tests);
+    // 3. Salva no banco
+    GenerationCache entity = new GenerationCache();
+    entity.setHash(key);
+    entity.setName(javaClass.getName());
+    entity.setSourceCode(javaClass.getSourceCode());
+    entity.setResult(documentation); // ou combine doc+test se preferir
+    cacheRepository.save(entity);
+    return result;
   }
 }

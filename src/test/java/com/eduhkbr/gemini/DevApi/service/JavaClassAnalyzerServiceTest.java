@@ -3,6 +3,7 @@ package com.eduhkbr.gemini.DevApi.service;
 import com.eduhkbr.gemini.DevApi.llm.LlmClient;
 import com.eduhkbr.gemini.DevApi.model.JavaClass;
 import com.eduhkbr.gemini.DevApi.model.GenerationResult;
+import com.eduhkbr.gemini.DevApi.repository.GenerationCacheRepository;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -12,13 +13,16 @@ import static org.mockito.Mockito.*;
 
 class JavaClassAnalyzerServiceTest {
     private final LlmClient llmClient = mock(LlmClient.class);
-    private final JavaClassAnalyzerService service = new JavaClassAnalyzerService(llmClient);
+    private final GenerationCacheRepository cacheRepository = mock(GenerationCacheRepository.class);
+    private final JavaClassAnalyzerService service = new JavaClassAnalyzerService(llmClient, cacheRepository);
 
     @Test
     void testAnalyze_QuandoClasseValida_DeveRetornarResultado() throws Exception {
         // TODO: Arrange
         JavaClass javaClass = new JavaClass("MinhaClasse", "public class MinhaClasse {}");
         when(llmClient.sendPrompt(anyString())).thenReturn("doc", "test");
+        // Simula cache vazio
+        when(cacheRepository.findByHash(anyString())).thenReturn(java.util.Optional.empty());
         // Setando os templates via reflexão
         Field docTemplateField = JavaClassAnalyzerService.class.getDeclaredField("docTemplate");
         docTemplateField.setAccessible(true);

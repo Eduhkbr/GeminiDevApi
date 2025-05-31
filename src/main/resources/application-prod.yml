@@ -2,6 +2,27 @@ spring:
   profiles: prod
   application:
     name: DevApi
+  datasource:
+    url: jdbc:postgresql://localhost:5432/proddb
+    driver-class-name: org.postgresql.Driver
+    username: produser
+    password: prodpass
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
 logging:
   level:
     root: INFO
+    com.eduhkbr.gemini.DevApi: WARN
+cors:
+  allowed-origins: 'https://seusite.com'
+  allowed-methods: 'GET,POST'
+cache:
+  type: caffeine
+custom:
+  feature-x-enabled: false

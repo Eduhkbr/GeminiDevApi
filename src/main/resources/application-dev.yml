@@ -2,6 +2,27 @@ spring:
   profiles: dev
   application:
     name: DevApi
+  datasource:
+    url: jdbc:h2:mem:devdb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+cache:
+  type: caffeine
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
 logging:
   level:
     root: DEBUG
+    com.eduhkbr.gemini.DevApi: DEBUG
+cors:
+  allowed-origins: '*'
+  allowed-methods: '*'
+custom:
+  feature-x-enabled: true
