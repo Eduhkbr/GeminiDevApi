@@ -21,17 +21,21 @@ analysis:
       - Como a classe trata erros
 
     tests: |
-      Você é um engenheiro de QA especialista em testes unitários. Gere um esqueleto de teste JUnit 5 para a classe Java abaixo.
+      Gere um esqueleto de teste JUnit 5 para a classe Java abaixo, seguindo boas práticas de nomes de métodos de teste.
       Nome: %s
       Código:
       ```java
       %s
       ```
-      Inclua:
-      - Nome do teste: <NOME_DA_CLASSE>Test.java
+      Requisitos:
+      - Nome do arquivo: <NOME_DA_CLASSE>Test.java
       - Importações JUnit 5
-      - Um método @Test para cada método público
-      - Comentários // TODO: Arrange, // TODO: Act, // TODO: Assert
-      - Sugestão de cenário feliz e de exceção (se aplicável)
-      - // TODO: Mockar dependências se necessário
-      Não implemente a lógica dos testes, apenas o esqueleto e sugestões.
+      - Para cada método público, crie:
+        - Um método de teste cenário feliz: <metodo>_quandoEntradaValida_entao<Resultado>()
+        - Um método de teste de exceção (se aplicável): <metodo>_quandoEntradaInvalida_entao<Excecao>()
+      - Cada método deve conter:
+        // TODO: Mockar dependências se necessário
+        // TODO: Arrange
+        // TODO: Act
+        // TODO: Assert
+      - Não implemente a lógica dos testes, apenas o esqueleto e sugestões.
