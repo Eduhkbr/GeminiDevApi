@@ -26,30 +26,36 @@ public class GeminiLlmClient implements LlmClient {
   @Override
   public String sendPrompt(String prompt) {
     logger.info("Enviando prompt para Gemini: {}", prompt);
-    GenerateTextRequest body = new GenerateTextRequest(
-      props.getModelName(),
-      new Prompt(prompt),
-      512,
-      0.2
-    );
+    // Monta o corpo conforme Gemini 2.x
+    Part part = new Part(prompt);
+    Content content = new Content("user", List.of(part));
+    GenerateContentRequest body = new GenerateContentRequest(List.of(content));
 
-    Mono<GenerateTextResponse> resp = client.post()
-      .uri("/models/{model}:generateText", props.getModelName())
+    Mono<GenerateContentResponse> resp = client.post()
+      .uri(uriBuilder -> uriBuilder
+        .path("/models/{model}:generateContent")
+        .queryParam("key", props.getKey())
+        .build(props.getModelName()))
       .bodyValue(body)
       .retrieve()
-      .bodyToMono(GenerateTextResponse.class);
+      .bodyToMono(GenerateContentResponse.class);
 
-    GenerateTextResponse r = resp.block();
-    if (r != null && !r.candidates().isEmpty()) {
-      logger.info("Resposta recebida do Gemini: {}", r.candidates().get(0).output());
-      return r.candidates().get(0).output();
+    GenerateContentResponse r = resp.block();
+    if (r != null && r.candidates() != null && !r.candidates().isEmpty()) {
+      List<Part> parts = r.candidates().get(0).content().parts();
+      if (parts != null && !parts.isEmpty()) {
+        logger.info("Resposta recebida do Gemini: {}", parts.get(0).text());
+        return parts.get(0).text();
+      }
     }
     logger.warn("Nenhuma resposta recebida do Gemini");
     return null;
   }
 }
 
-record Prompt(String text) {}
-record GenerateTextRequest(String model, Prompt prompt, int maxOutputTokens, double temperature) {}
-record Candidate(String output) {}
-record GenerateTextResponse(List<Candidate> candidates) {}
+// Records para Gemini 2.x REST API
+record Part(String text) {}
+record Content(String role, List<Part> parts) {}
+record GenerateContentRequest(List<Content> contents) {}
+record Candidate(Content content) {}
+record GenerateContentResponse(List<Candidate> candidates) {}

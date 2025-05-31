@@ -18,7 +18,6 @@ public class WebClientConfig {
     public WebClient.Builder webClientBuilder() {
         return WebClient.builder()
             .baseUrl(props.getBaseUrl())
-            .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + props.getKey())
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
     }
 
