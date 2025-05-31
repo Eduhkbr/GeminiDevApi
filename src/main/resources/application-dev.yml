@@ -1,5 +1,7 @@
 spring:
-  profiles: dev
+  config:
+    activate:
+      on-profile: dev
   application:
     name: DevApi
   datasource:
@@ -17,6 +19,10 @@ management:
   endpoint:
     health:
       show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
 logging:
   level:
     root: DEBUG

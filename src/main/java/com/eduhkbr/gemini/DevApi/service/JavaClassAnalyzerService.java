@@ -5,6 +5,8 @@ import com.eduhkbr.gemini.DevApi.model.GenerationResult;
 import com.eduhkbr.gemini.DevApi.model.JavaClass;
 import com.eduhkbr.gemini.DevApi.model.GenerationCache;
 import com.eduhkbr.gemini.DevApi.repository.GenerationCacheRepository;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.transaction.annotation.Transactional;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -31,15 +33,19 @@ public class JavaClassAnalyzerService {
   private String docTemplate;
   @Value("${analysis.prompt.tests}")
   private String testTemplate;
+  private final Counter cacheHitCounter;
+  private final Counter iaCallCounter;
 
   /**
    * Construtor com injeção de dependência do client LLM.
    * @param llm client para comunicação com modelo generativo
    * @param cacheRepository repositório para cache de gerações
    */
-  public JavaClassAnalyzerService(LlmClient llm, GenerationCacheRepository cacheRepository) {
+  public JavaClassAnalyzerService(LlmClient llm, GenerationCacheRepository cacheRepository, MeterRegistry meterRegistry) {
     this.llm = llm;
     this.cacheRepository = cacheRepository;
+    this.cacheHitCounter = meterRegistry.counter("generation.cache.hits");
+    this.iaCallCounter = meterRegistry.counter("generation.ia.calls");
   }
 
   /**
@@ -48,13 +54,15 @@ public class JavaClassAnalyzerService {
   @Cacheable(value = "generationResult", key = "#javaClass.name + '-' + T(org.apache.commons.codec.digest.DigestUtils).sha256Hex(#javaClass.sourceCode)")
   @Transactional
   public GenerationResult analyze(JavaClass javaClass) {
-    String key = javaClass.getName() + "-" + DigestUtils.sha256Hex(javaClass.getSourceCode());
+    String key = javaClass.getName() + "-" + org.apache.commons.codec.digest.DigestUtils.sha256Hex(javaClass.getSourceCode());
     // 1. Busca no banco
     GenerationCache cached = cacheRepository.findByHash(key).orElse(null);
     if (cached != null) {
+      cacheHitCounter.increment();
       return new GenerationResult(cached.getResult(), null); // Ajuste conforme estrutura
     }
     // 2. Chama IA
+    iaCallCounter.increment();
     logger.info("Analisando classe: {} (cache miss)", javaClass.getName());
     String promptDoc = null;
     String documentation = null;

@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  redis:
+    image: redis:7.2-alpine
+    container_name: redis-dev
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus-dev
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    restart: unless-stopped
+
+  geminidevapi:
+    build: .
+    container_name: geminidevapi-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    restart: unless-stopped

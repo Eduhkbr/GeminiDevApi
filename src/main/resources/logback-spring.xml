@@ -8,4 +8,10 @@
     <root level="INFO">
         <appender-ref ref="STDOUT" />
     </root>
+    <!-- Reduz logs de auto-configuração do SpringDoc e Spring Boot -->
+    <logger name="org.springdoc" level="WARN"/>
+    <logger name="org.springframework.boot.autoconfigure" level="WARN"/>
+    <logger name="org.springframework.data.convert" level="WARN"/>
+    <logger name="com.zaxxer.hikari.pool.HikariPool" level="WARN"/>
+    <logger name="o.s.b.f.s.DefaultListableBeanFactory" level="WARN"/>
 </configuration>
