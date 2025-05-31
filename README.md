@@ -151,18 +151,9 @@ Este projeto está sob a licença MIT.
 Para analisar uma ou mais classes Java, utilize o endpoint `/v1/analyze` conforme o exemplo abaixo:
 
 ```bash
-curl -X POST http://localhost:8080/v1/analyze \
-  -u user:e5fabd54-e456-4aef-9b74-60a058d95ebc \
-  -H "Content-Type: application/json" \
-  -d '[
-    {
-      "name": "OrderService.java",
-      "sourceCode": "public class OrderService {\n  /\n   * Cria um novo pedido no sistema.\n   /\n  public String createOrder(Order order) {\n    if (order == null || order.getCustomerId() == null) {\n      return null;\n    }\n    return generateOrderId();\n  }\n\n  /\n   * Busca um pedido pelo ID.\n   */\n  public Order getOrder(String orderId) {\n    if (orderId == null) {\n      return null;\n    }\n    Order order = new Order();\n    order.setOrderId(orderId);\n    return order;\n  }\n\n  /*\n   * Cancela um pedido pelo ID.\n   */\n  public boolean cancelOrder(String orderId) {\n    return orderId != null;\n  }\n\n  // Gera um ID simples para o pedido\n  private String generateOrderId() {\n    return \"ORD-\" + System.currentTimeMillis();\n  }\n}"
-    }
-  ]'
+curl -X POST http://localhost:8080/v1/analyze   -u user:b0948d42-977f-46e2-b1c4-e27234d16ad0   -H "Content-Type: application/json"   -d @payload.json
 ```
 
 - Substitua o usuário e a senha pelo seu token de autenticação, se necessário.
-- O corpo da requisição deve ser um array de objetos com os campos `name` e `sourceCode`.
 
 ---

@@ -9,7 +9,6 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.transaction.annotation.Transactional;
-import org.apache.commons.codec.digest.DigestUtils;
 import java.util.MissingFormatArgumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
