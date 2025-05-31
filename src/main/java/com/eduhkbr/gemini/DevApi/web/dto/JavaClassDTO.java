@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 
 /**
  * DTO para transferência de dados de classes Java.
+ * Utilizado como entrada nos endpoints REST.
  */
 public class JavaClassDTO {
     @NotBlank(message = "O nome da classe não pode ser vazio")

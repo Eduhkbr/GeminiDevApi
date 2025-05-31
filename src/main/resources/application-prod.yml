@@ -3,10 +3,10 @@ spring:
   application:
     name: DevApi
   datasource:
-    url: jdbc:postgresql://localhost:5432/proddb
-    driver-class-name: org.postgresql.Driver
-    username: produser
-    password: prodpass
+    url: ${DEVAPI_DB_URL:jdbc:postgresql://localhost:5432/proddb}
+    driver-class-name: ${DEVAPI_DB_DRIVER:org.postgresql.Driver}
+    username: ${DEVAPI_DB_USER:produser}
+    password: ${DEVAPI_DB_PASS:prodpass}
 management:
   endpoints:
     web:

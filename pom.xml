@@ -28,7 +28,31 @@
 	</scm>
 	<properties>
 		<java.version>21</java.version>
+		<springdoc-openapi.version>2.5.0</springdoc-openapi.version>
+		<commons-codec.version>1.15</commons-codec.version>
+		<javax-servlet.version>4.0.1</javax-servlet.version>
+		<asciidoctor-maven-plugin.version>2.2.1</asciidoctor-maven-plugin.version>
+		<dependency-check-maven.version>9.0.9</dependency-check-maven.version>
 	</properties>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springdoc</groupId>
+				<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+				<version>${springdoc-openapi.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-codec</groupId>
+				<artifactId>commons-codec</artifactId>
+				<version>${commons-codec.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>javax.servlet-api</artifactId>
+				<version>${javax-servlet.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -133,7 +157,7 @@
 			<plugin>
 				<groupId>org.asciidoctor</groupId>
 				<artifactId>asciidoctor-maven-plugin</artifactId>
-				<version>2.2.1</version>
+				<version>${asciidoctor-maven-plugin.version}</version>
 				<executions>
 					<execution>
 						<id>generate-docs</id>
@@ -162,7 +186,7 @@
 			<plugin>
 				<groupId>org.owasp</groupId>
 				<artifactId>dependency-check-maven</artifactId>
-				<version>9.0.9</version>
+				<version>${dependency-check-maven.version}</version>
 				<executions>
 					<execution>
 						<goals>
@@ -171,7 +195,6 @@
 					</execution>
 				</executions>
 				<configuration>
-					<!-- Permite build sem falhar caso não consiga atualizar o NVD (útil para builds locais sem API Key) -->
 					<failOnError>false</failOnError>
 					<nvdApiKey>${env.NVD_API_KEY}</nvdApiKey>
 					<cveValidForHours>12</cveValidForHours>

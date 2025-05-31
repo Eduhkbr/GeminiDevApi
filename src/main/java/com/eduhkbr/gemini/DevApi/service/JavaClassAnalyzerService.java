@@ -92,7 +92,8 @@ public class JavaClassAnalyzerService {
     entity.setHash(key);
     entity.setName(javaClass.getName());
     entity.setSourceCode(javaClass.getSourceCode());
-    entity.setResult(documentation); // ou combine doc+test se preferir
+    // Garante que result nunca será null
+    entity.setResult(documentation != null ? documentation : "N/A"); // ou combine doc+test se preferir
     cacheRepository.save(entity);
     return result;
   }

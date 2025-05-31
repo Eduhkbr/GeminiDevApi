@@ -5,10 +5,10 @@ spring:
   application:
     name: DevApi
   datasource:
-    url: jdbc:h2:mem:devdb;DB_CLOSE_DELAY=-1
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
+    url: ${DEVAPI_DB_URL:jdbc:h2:mem:devdb;DB_CLOSE_DELAY=-1}
+    driver-class-name: ${DEVAPI_DB_DRIVER:org.h2.Driver}
+    username: ${DEVAPI_DB_USER:sa}
+    password: ${DEVAPI_DB_PASS:}
 cache:
   type: caffeine
 management:

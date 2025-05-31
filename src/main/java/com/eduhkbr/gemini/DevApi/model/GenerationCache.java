@@ -3,6 +3,10 @@ package com.eduhkbr.gemini.DevApi.model;
 import jakarta.persistence.*;
 import java.time.Instant;
 
+/**
+ * Entidade que representa o cache de resultados de geração automática.
+ * Utilizada para persistir o resultado da análise de classes Java.
+ */
 @Entity
 @Table(name = "generation_cache")
 public class GenerationCache {

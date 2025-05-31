@@ -1,0 +1,6 @@
+[
+  {
+    "name": "OrderService.java",
+    "sourceCode": "public class OrderService {\n  /*\n   * Cria um novo pedido no sistema.\n   */\n  public String createOrder(Order order) {\n    if (order == null || order.getCustomerId() == null) {\n      return null;\n    }\n    return generateOrderId();\n  }\n\n  /*\n   * Busca um pedido pelo ID.\n   */\n  public Order getOrder(String orderId) {\n    if (orderId == null) {\n      return null;\n    }\n    Order order = new Order();\n    order.setOrderId(orderId);\n    return order;\n  }\n\n  /*\n   * Cancela um pedido pelo ID.\n   */\n  public boolean cancelOrder(String orderId) {\n    return orderId != null;\n  }\n\n  // Gera um ID simples para o pedido\n  private String generateOrderId() {\n    return \"ORD-\" + System.currentTimeMillis();\n  }\n}"
+  }
+]

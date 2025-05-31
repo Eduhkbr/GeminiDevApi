@@ -25,4 +25,5 @@ services:
       - redis
     environment:
       - SPRING_PROFILES_ACTIVE=dev
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
     restart: unless-stopped

@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Controller responsável por analisar classes Java e retornar resultados de geração.
+ * Controller REST para análise de classes Java.
+ * Recebe uma lista de DTOs e retorna documentação e testes gerados.
  */
 @RestController
 @RequestMapping("/v1/analyze")
