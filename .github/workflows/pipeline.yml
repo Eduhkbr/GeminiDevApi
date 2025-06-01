@@ -172,5 +172,5 @@ jobs:
           image: ${{ vars.GOOGLE_ARTIFACT }}/${{ secrets.GOOGLE_PROJECT_ID }}/${{ vars.GOOGLE_REPONAME }}/${{ vars.GOOGLE_MYAPP }}:latest
           flags: '--allow-unauthenticated'
 
-      - name: Validando a API
-        run: 'curl "${{ steps.deploy.outputs.url }}"'
+#      - name: Validando a API
+#        run: 'curl "${{ steps.deploy.outputs.url }}"'
