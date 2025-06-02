@@ -1,8 +1,8 @@
-name: pipeline
+name: pipelinedev
 on:
   push:
     branches:
-      - main
+      - develop
 
 jobs:
   analyze:
@@ -54,10 +54,10 @@ jobs:
         run: echo "JAVA_HOME is set to $JAVA_HOME"
 
       - name: Run Maven Tests
-        run: mvn test -Dspring.profiles.active=prod
+        run: mvn test
 
       - name: Gerar relatório JaCoCo (CSV)
-        run: mvn jacoco:report -Dspring.profiles.active=prod
+        run: mvn jacoco:report
 
       - name: Generate JaCoCo Badge
         id: jacoco
@@ -127,50 +127,3 @@ jobs:
 
       - name: Package
         run: mvn package
-
-  container-build:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Login no Artifact Registry
-        uses: docker/login-action@v3
-        with:
-          registry: '${{ vars.GOOGLE_ARTIFACT }}'
-          username: _json_key
-          password: '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}'
-
-      - name: Build Image
-        run: |
-          docker build -t ${{ vars.GOOGLE_ARTIFACT }}/${{ secrets.GOOGLE_PROJECT_ID }}/${{ vars.GOOGLE_REPONAME }}/${{ vars.GOOGLE_MYAPP }}:latest .
-
-      - name: Push Image
-        run: |
-          docker push ${{ vars.GOOGLE_ARTIFACT }}/${{ secrets.GOOGLE_PROJECT_ID }}/${{ vars.GOOGLE_REPONAME }}/${{ vars.GOOGLE_MYAPP }}:latest
-
-  deploy:
-    needs: container-build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Login no GCP
-        uses: 'google-github-actions/auth@v2'
-        with:
-          project_id: ${{ secrets.GOOGLE_PROJECT_ID }}
-          credentials_json: '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}'
-
-      - name: Cloud Run Deploy
-        id: deploy
-        uses: 'google-github-actions/deploy-cloudrun@v2'
-        with:
-          service: ${{ vars.GOOGLE_MYAPP }}
-          region: ${{ vars.GOOGLE_REGION }}
-          image: ${{ vars.GOOGLE_ARTIFACT }}/${{ secrets.GOOGLE_PROJECT_ID }}/${{ vars.GOOGLE_REPONAME }}/${{ vars.GOOGLE_MYAPP }}:latest
-          flags: '--allow-unauthenticated'
-
-#      - name: Validando a API
-#        run: 'curl "${{ steps.deploy.outputs.url }}"'

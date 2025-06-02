@@ -75,6 +75,9 @@ public class JavaClassAnalyzerService {
     } catch (MissingFormatArgumentException e) {
       logger.error("Erro de formatação no template de documentação: {} | Template: {} | Args: nome={}, sourceCode={}", e.getMessage(), docTemplate, javaClass.getName(), javaClass.getSourceCode(), e);
       documentation = "[ERRO] Falha ao gerar documentação: template inválido ou argumentos insuficientes.";
+    } catch (Exception e) {
+      logger.error("Erro inesperado ao gerar documentação: {}", e.getMessage(), e);
+      documentation = null;
     }
     try {
       logger.info("Template de testes: {}", testTemplate);
@@ -84,8 +87,14 @@ public class JavaClassAnalyzerService {
     } catch (MissingFormatArgumentException e) {
       logger.error("Erro de formatação no template de testes: {} | Template: {} | Args: nome={}, sourceCode={}", e.getMessage(), testTemplate, javaClass.getName(), javaClass.getSourceCode(), e);
       tests = "[ERRO] Falha ao gerar testes: template inválido ou argumentos insuficientes.";
+    } catch (Exception e) {
+      logger.error("Erro inesperado ao gerar testes: {}", e.getMessage(), e);
+      tests = null;
     }
-    GenerationResult result = new GenerationResult(documentation, tests);
+    GenerationResult result = new GenerationResult(
+      documentation != null ? documentation : "[ERRO] Falha ao gerar documentação: resultado nulo.",
+      tests != null ? tests : "[ERRO] Falha ao gerar testes: resultado nulo."
+    );
     // 3. Salva no banco
     GenerationCache entity = new GenerationCache();
     entity.setHash(key);
