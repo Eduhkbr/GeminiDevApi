@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Gemini API</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        .container { max-width: 350px; margin: 80px auto; background: #fff; padding: 2em; border-radius: 8px; box-shadow: 0 2px 8px #0001; }
+        h2 { text-align: center; }
+        input, button { width: 100%; margin: 0.5em 0; padding: 0.7em; border-radius: 4px; border: 1px solid #ccc; }
+        .error { color: #c00; text-align: center; }
+        .success { color: #080; text-align: center; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Login Gemini API</h2>
+    <form id="loginForm">
+        <input type="text" id="username" placeholder="Usuário" required autofocus>
+        <input type="password" id="password" placeholder="Senha" required>
+        <button type="submit">Entrar</button>
+    </form>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

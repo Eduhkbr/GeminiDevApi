@@ -126,6 +126,8 @@ jobs:
           distribution: temurin
 
       - name: Package
+        env:
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
         run: mvn package
 
   container-build:

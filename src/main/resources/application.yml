@@ -39,3 +39,7 @@ analysis:
         // TODO: Act
         // TODO: Assert
       - Não implemente a lógica dos testes, apenas o esqueleto e sugestões.
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
+  expiration: 3600000
