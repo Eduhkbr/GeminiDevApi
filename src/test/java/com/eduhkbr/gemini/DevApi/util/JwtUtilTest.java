@@ -15,6 +15,17 @@ class JwtUtilTest {
     @BeforeEach
     void setUp() {
         jwtUtil = new JwtUtil();
+        // Força a chave secreta para os testes
+        try {
+            java.lang.reflect.Field secretKeyField = JwtUtil.class.getDeclaredField("SECRET_KEY");
+            secretKeyField.setAccessible(true);
+            secretKeyField.set(jwtUtil, "chave-secreta-teste");
+            java.lang.reflect.Field expirationField = JwtUtil.class.getDeclaredField("EXPIRATION");
+            expirationField.setAccessible(true);
+            expirationField.set(jwtUtil, 3600000L);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
