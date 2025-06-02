@@ -38,3 +38,6 @@ cors:
   allowed-methods: '*'
 custom:
   feature-x-enabled: true
+jwt:
+  secret-key: chave-secreta-teste
+  expiration: 3600000
