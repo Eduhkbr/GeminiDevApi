@@ -3,14 +3,17 @@ package com.eduhkbr.gemini.DevApi.util;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
 @Component
 public class JwtUtil {
-    private final String SECRET_KEY = "sua-chave-secreta-muito-forte"; // Troque por uma chave segura
-    private final long EXPIRATION = 1000 * 60 * 60; // 1 hora
+    @Value("${jwt.secret-key}")
+    private String SECRET_KEY;
+    @Value("${jwt.expiration:3600000}")
+    private long EXPIRATION;
 
     public String generateToken(String username, String role) {
         return Jwts.builder()
