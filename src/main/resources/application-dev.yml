@@ -9,6 +9,12 @@ spring:
     driver-class-name: ${DEVAPI_DB_DRIVER:org.h2.Driver}
     username: ${DEVAPI_DB_USER:sa}
     password: ${DEVAPI_DB_PASS:}
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
 cache:
   type: caffeine
 management:
