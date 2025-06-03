@@ -58,3 +58,10 @@ server:
         secure: true
         http-only: true
   forward-headers-strategy: framework
+env_vars: |
+  JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
+  SPRING_PROFILES_ACTIVE=prod
+  DEVAPI_DB_URL=${{ secrets.DEVAPI_DB_URL }}
+  DEVAPI_DB_DRIVER=${{ secrets.DEVAPI_DB_DRIVER }}
+  DEVAPI_DB_USER=${{ secrets.DEVAPI_DB_USER }}
+  DEVAPI_DB_PASS=${{ secrets.DEVAPI_DB_PASS }}
