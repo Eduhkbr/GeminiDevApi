@@ -173,6 +173,8 @@ jobs:
           region: ${{ vars.GOOGLE_REGION }}
           image: ${{ vars.GOOGLE_ARTIFACT }}/${{ secrets.GOOGLE_PROJECT_ID }}/${{ vars.GOOGLE_REPONAME }}/${{ vars.GOOGLE_MYAPP }}:latest
           flags: '--allow-unauthenticated'
+        env:
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
 
 #      - name: Validando a API
 #        run: 'curl "${{ steps.deploy.outputs.url }}"'
