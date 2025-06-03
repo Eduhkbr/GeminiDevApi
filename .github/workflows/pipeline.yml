@@ -147,6 +147,7 @@ jobs:
           env_vars: |
             JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
             SPRING_PROFILES_ACTIVE=prod
+            DB_NAME=${{ secrets.DB_NAME }}
             DEVAPI_DB_URL=${{ secrets.DEVAPI_DB_URL }}
             DEVAPI_DB_DRIVER=org.postgresql.Driver
             DEVAPI_DB_USER=${{ secrets.DEVAPI_DB_USER }}
