@@ -146,6 +146,7 @@ jobs:
           flags: '--allow-unauthenticated'
           env_vars: |
             JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
+            SPRING_PROFILES_ACTIVE=prod
 
 #      - name: Validando a API
 #        run: 'curl "${{ steps.deploy.outputs.url }}"'
