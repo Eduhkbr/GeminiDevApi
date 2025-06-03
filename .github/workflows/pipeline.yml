@@ -146,11 +146,11 @@ jobs:
 
       - name: Build Image
         run: |
-          docker build -t ${{ vars.GOOGLE_ARTIFACT }}/${{ secrets.GOOGLE_PROJECT_ID }}/${{ vars.GOOGLE_REPONAME }}/${{ vars.GOOGLE_MYAPP }}:latest .
+          docker build -t ${{ vars.GOOGLE_ARTIFACT }}/${{ secrets.GOOGLE_PROJECT_ID }}/${{ vars.GOOGLE_REPONAME }}/devapi-service:latest .
 
       - name: Push Image
         run: |
-          docker push ${{ vars.GOOGLE_ARTIFACT }}/${{ secrets.GOOGLE_PROJECT_ID }}/${{ vars.GOOGLE_REPONAME }}/${{ vars.GOOGLE_MYAPP }}:latest
+          docker push ${{ vars.GOOGLE_ARTIFACT }}/${{ secrets.GOOGLE_PROJECT_ID }}/${{ vars.GOOGLE_REPONAME }}/devapi-service:latest
 
   deploy:
     needs: container-build
@@ -169,9 +169,9 @@ jobs:
         id: deploy
         uses: 'google-github-actions/deploy-cloudrun@v2'
         with:
-          service: ${{ vars.GOOGLE_MYAPP }}
+          service: devapi-service
           region: ${{ vars.GOOGLE_REGION }}
-          image: ${{ vars.GOOGLE_ARTIFACT }}/${{ secrets.GOOGLE_PROJECT_ID }}/${{ vars.GOOGLE_REPONAME }}/${{ vars.GOOGLE_MYAPP }}:latest
+          image: ${{ vars.GOOGLE_ARTIFACT }}/${{ secrets.GOOGLE_PROJECT_ID }}/${{ vars.GOOGLE_REPONAME }}/devapi-service:latest
           flags: '--allow-unauthenticated'
         env:
           JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
