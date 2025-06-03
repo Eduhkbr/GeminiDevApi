@@ -1,5 +1,4 @@
 spring:
-  profiles: prod
   application:
     name: DevApi
   datasource:
