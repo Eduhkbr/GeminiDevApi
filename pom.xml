@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.eduhkbr.gemini</groupId>
 	<artifactId>DevApi</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<name>DevApi</name>
 	<description>DevApi</description>
 	<url/>
