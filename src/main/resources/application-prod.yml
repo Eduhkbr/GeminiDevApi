@@ -25,7 +25,7 @@ spring:
   redis:
     host: ${REDIS_HOST}
     port: ${REDIS_PORT:6379}
-    password: ${REDIS_PASSWORD:}
+    password: ${REDIS_PASSWORD}
     ssl: true
 management:
   endpoints:
@@ -42,7 +42,7 @@ logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
 cors:
-  allowed-origins: ${CORS_ALLOWED_ORIGINS:https://seusite.com}
+  allowed-origins: ${CORS_ALLOWED_ORIGINS}
   allowed-methods: ${CORS_ALLOWED_METHODS:GET,POST}
 cache:
   type: caffeine
@@ -58,10 +58,3 @@ server:
         secure: true
         http-only: true
   forward-headers-strategy: framework
-env_vars: |
-  JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
-  SPRING_PROFILES_ACTIVE=prod
-  DEVAPI_DB_URL=${{ secrets.DEVAPI_DB_URL }}
-  DEVAPI_DB_DRIVER=${{ secrets.DEVAPI_DB_DRIVER }}
-  DEVAPI_DB_USER=${{ secrets.DEVAPI_DB_USER }}
-  DEVAPI_DB_PASS=${{ secrets.DEVAPI_DB_PASS }}
