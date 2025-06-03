@@ -86,23 +86,24 @@ function makeCollapsible(pre) {
 }
 
 // Histórico de requisições
-function saveHistory(payload, response) {
+function saveHistory(payloadObj, response) {
     let hist = JSON.parse(localStorage.getItem('analyzeHistory') || '[]');
-    hist.unshift({ payload, response, date: new Date().toLocaleString() });
+    hist.unshift({ name: payloadObj.name, sourceCode: payloadObj.sourceCode, response, date: new Date().toLocaleString() });
     if (hist.length > 10) hist = hist.slice(0, 10);
     localStorage.setItem('analyzeHistory', JSON.stringify(hist));
     renderHistory();
 }
 function renderHistory() {
-    if (!historyList) return; // Evita erro se não estiver na app.html
+    if (!historyList) return;
     let hist = JSON.parse(localStorage.getItem('analyzeHistory') || '[]');
     historyList.innerHTML = '';
     hist.forEach((item, idx) => {
         const div = document.createElement('div');
         div.className = 'history-item';
-        div.innerHTML = `<b>${item.date}</b><br><code>${item.payload.substring(0, 80)}...</code>`;
+        div.innerHTML = `<b>${item.date}</b><br><code>${item.name}</code>`;
         div.onclick = () => {
-            document.getElementById('payload').value = item.payload;
+            document.getElementById('className').value = item.name;
+            document.getElementById('classCode').value = item.sourceCode;
             if (jsonResult) jsonResult.innerHTML = syntaxHighlight(JSON.parse(item.response));
         };
         historyList.appendChild(div);
@@ -117,7 +118,14 @@ if (analyzeBtn) {
             if (analyzeMsg) analyzeMsg.innerHTML = '<span class="error">Faça login antes de enviar requisições.</span>';
             return;
         }
-        const payload = document.getElementById('payload').value;
+        const name = document.getElementById('className').value.trim();
+        const sourceCode = document.getElementById('classCode').value;
+        if (!name || !sourceCode) {
+            if (analyzeMsg) analyzeMsg.innerHTML = '<span class="error">Preencha o nome e o código da classe.</span>';
+            return;
+        }
+        const payloadObj = { name, sourceCode };
+        const payload = JSON.stringify(payloadObj);
         if (analyzeMsg) analyzeMsg.innerHTML = '<span class="success">Enviando...</span>';
         if (jsonResult) jsonResult.textContent = '';
         try {
@@ -140,7 +148,7 @@ if (analyzeBtn) {
             } else {
                 if (analyzeMsg) analyzeMsg.innerHTML = '<span class="error">Erro: ' + resp.status + '</span>';
             }
-            saveHistory(payload, text);
+            saveHistory(payloadObj, text);
         } catch (err) {
             if (analyzeMsg) analyzeMsg.innerHTML = '<span class="error">Erro ao enviar requisição: ' + err + '</span>';
         }

@@ -8,9 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
  * Controller REST para análise de classes Java.
  * Recebe uma lista de DTOs e retorna documentação e testes gerados.
@@ -26,16 +23,14 @@ public class GenerationController {
   }
 
   /**
-   * Analisa uma lista de classes Java e retorna os resultados.
-   * @param classes lista de DTOs de classes Java
-   * @return lista de resultados de geração
+   * Analisa uma classe Java e retorna o resultado.
+   * @param dto DTO de classe Java
+   * @return resultado de geração
    */
   @PostMapping
-  public ResponseEntity<List<GenerationResult>> analyze(@Valid @RequestBody List<JavaClassDTO> classes) {
-    var results = classes.stream()
-      .map(dto -> new JavaClass(dto.getName(), dto.getSourceCode()))
-      .map(analyzer::analyze)
-      .collect(Collectors.toList());
-    return ResponseEntity.ok(results);
+  public ResponseEntity<GenerationResult> analyze(@Valid @RequestBody JavaClassDTO dto) {
+    JavaClass javaClass = new JavaClass(dto.getName(), dto.getSourceCode());
+    GenerationResult result = analyzer.analyze(javaClass);
+    return ResponseEntity.ok(result);
   }
 }

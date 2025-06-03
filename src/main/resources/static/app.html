@@ -34,8 +34,10 @@
     <button class="dark-toggle" onclick="toggleDarkMode()" id="darkBtn">🌙</button>
     <button class="logout" onclick="logout()">Sair</button>
     <h2>Gemini API - Requisições</h2>
-    <label for="payload">Payload para /v1/analyze:</label>
-    <textarea id="payload" rows="6" placeholder='[{"name":"OrderService","sourceCode":"public class OrderService {}"}]'></textarea>
+    <label for="className">Nome da Classe:</label>
+    <input id="className" type="text" placeholder="OrderService.java" />
+    <label for="classCode">Código da Classe:</label>
+    <textarea id="classCode" rows="10" placeholder="public class OrderService {\n  ...\n}"></textarea>
     <button id="analyzeBtn">Enviar</button>
     <div id="analyzeMsg"></div>
     <div class="history" id="historyBox">
