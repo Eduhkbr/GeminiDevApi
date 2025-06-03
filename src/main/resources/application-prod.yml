@@ -51,6 +51,7 @@ cache:
 custom:
   feature-x-enabled: false
 server:
+  port: 8080
   servlet:
     session:
       cookie:

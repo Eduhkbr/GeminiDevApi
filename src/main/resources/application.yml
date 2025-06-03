@@ -43,3 +43,6 @@ analysis:
 jwt:
   secret-key: ${JWT_SECRET_KEY}
   expiration: 3600000
+
+server:
+  port: 8080

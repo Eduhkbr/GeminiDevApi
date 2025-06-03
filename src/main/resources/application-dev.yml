@@ -41,3 +41,5 @@ custom:
 jwt:
   secret-key: chave-secreta-teste
   expiration: 3600000
+server:
+  port: 8080
