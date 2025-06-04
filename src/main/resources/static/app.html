@@ -7,13 +7,13 @@
         body { font-family: Arial, sans-serif; background: #181c1f; color: #e0e0e0; transition: background 0.3s, color 0.3s; }
         .container { max-width: 700px; margin: 40px auto; background: #23272a; padding: 2em; border-radius: 8px; box-shadow: 0 2px 8px #0003; }
         h2 { text-align: center; }
-        textarea, input, button { width: 100%; margin: 0.5em 0; padding: 0.7em; border-radius: 4px; border: 1px solid #444; background: #181c1f; color: #e0e0e0; }
-        textarea:focus, input:focus { outline: 2px solid #4e9cff; }
+        textarea, input, button, select { width: 100%; margin: 0.5em 0; padding: 0.7em; border-radius: 4px; border: 1px solid #444; background: #181c1f; color: #e0e0e0; }
+        textarea:focus, input:focus, select:focus { outline: 2px solid #4e9cff; }
         .logout { float: right; margin-top: -2.5em; background: #c00; color: #fff; border: none; width: auto; padding: 0.5em 1.2em; }
         .success, .error { display: block; text-align: center; margin: 1em 0; font-weight: bold; opacity: 0; animation: fadeIn 0.7s forwards; }
         .success { color: #4caf50; }
         .error { color: #ff5252; }
-        #jsonResult { background: #181c1f; color: #e0e0e0; padding: 1em; border-radius: 6px; overflow-x: auto; font-family: 'Fira Mono', 'Consolas', monospace; font-size: 1em; }
+        #jsonResult, #promptAnalyzeResult { background: #181c1f; color: #e0e0e0; padding: 1em; border-radius: 6px; overflow-x: auto; font-family: 'Fira Mono', 'Consolas', monospace; font-size: 1em; }
         .json-key { color: #4e9cff; cursor: pointer; }
         .json-string { color: #e6db74; }
         .json-number { color: #b5cea8; }
@@ -46,6 +46,16 @@
     </div>
     <h3>Resposta JSON</h3>
     <pre id="jsonResult"></pre>
+
+    <label for="professionSelect">Profissão:</label>
+    <select id="professionSelect"></select>
+    <label for="featureSelect">Funcionalidade:</label>
+    <select id="featureSelect"></select>
+    <label for="requestDescription">Descreva seu pedido:</label>
+    <textarea id="requestDescription" rows="4"></textarea>
+    <button id="promptAnalyzeBtn">Enviar para IA</button>
+    <div id="promptAnalyzeMsg"></div>
+    <pre id="promptAnalyzeResult"></pre>
 </div>
 <script src="app.js"></script>
 <script>

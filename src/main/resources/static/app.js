@@ -154,3 +154,75 @@ if (analyzeBtn) {
         }
     };
 }
+
+// --- INTEGRAÇÃO NOVO FLUXO GEMINI ---
+async function loadProfessions() {
+    const resp = await fetch('/api/professions');
+    const data = await resp.json();
+    const select = document.getElementById('professionSelect');
+    select.innerHTML = '<option value="">Selecione...</option>';
+    data.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = p.name;
+        select.appendChild(opt);
+    });
+}
+
+async function loadFeatures(professionId) {
+    const resp = await fetch('/api/features');
+    const data = await resp.json();
+    const select = document.getElementById('featureSelect');
+    select.innerHTML = '<option value="">Selecione...</option>';
+    data.filter(f => f.profession && f.profession.id == professionId)
+        .forEach(f => {
+            const opt = document.createElement('option');
+            opt.value = f.name;
+            opt.textContent = f.name;
+            select.appendChild(opt);
+        });
+}
+
+const professionSelect = document.getElementById('professionSelect');
+if (professionSelect) {
+    professionSelect.onchange = function() {
+        loadFeatures(this.value);
+    };
+}
+
+const promptAnalyzeBtn = document.getElementById('promptAnalyzeBtn');
+if (promptAnalyzeBtn) {
+    promptAnalyzeBtn.onclick = async function() {
+        const professionId = document.getElementById('professionSelect').value;
+        const professionName = document.getElementById('professionSelect').selectedOptions[0]?.textContent;
+        const feature = document.getElementById('featureSelect').value;
+        const description = document.getElementById('requestDescription').value;
+        const msg = document.getElementById('promptAnalyzeMsg');
+        const result = document.getElementById('promptAnalyzeResult');
+        if (!professionId || !feature || !description) {
+            msg.innerHTML = '<span class="error">Preencha todos os campos.</span>';
+            return;
+        }
+        msg.innerHTML = 'Enviando...';
+        result.textContent = '';
+        const payload = {
+            profession: professionName,
+            feature,
+            description
+        };
+        const resp = await fetch('/v1/prompt-analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const text = await resp.text();
+        if (resp.ok) {
+            result.textContent = text;
+            msg.innerHTML = '<span class="success">Resposta recebida!</span>';
+        } else {
+            msg.innerHTML = '<span class="error">Erro: ' + text + '</span>';
+        }
+    };
+}
+
+window.addEventListener('DOMContentLoaded', loadProfessions);

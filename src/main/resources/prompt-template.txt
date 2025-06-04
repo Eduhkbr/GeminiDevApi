@@ -1,0 +1,5 @@
+Profissão: {profissao}
+Funcionalidade: {funcionalidade}
+Descrição do pedido: {descricao}
+
+Gere a documentação em Markdown e um esqueleto de teste unitário Java para a funcionalidade acima, considerando o contexto da profissão.
