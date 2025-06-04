@@ -3,7 +3,6 @@ package com.eduhkbr.gemini.DevApi.service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-import java.nio.file.Files;
 import java.nio.charset.StandardCharsets;
 
 @Service
@@ -13,7 +12,10 @@ public class PromptTemplateService {
 
     public String buildPrompt(String profession, String feature, String description) {
         try {
-            String template = Files.readString(templateResource.getFile().toPath(), StandardCharsets.UTF_8);
+            String template;
+            try (var in = templateResource.getInputStream()) {
+                template = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+            }
             return template.replace("{profissao}", profession)
                            .replace("{funcionalidade}", feature)
                            .replace("{descricao}", description);

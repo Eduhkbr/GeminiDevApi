@@ -26,10 +26,11 @@ public class PromptAnalyzeController {
 
     @PostMapping(produces = MediaType.TEXT_PLAIN_VALUE, headers = "Accept=text/plain")
     public ResponseEntity<String> analyze(@Valid @RequestBody PromptRequestDTO dto) {
-        logger.info("Recebido: profession={}, feature={}, description={}", dto.getProfession(), dto.getFeature(), dto.getDescription());
+        // Log seguro: não loga dados controlados pelo usuário diretamente
+        logger.info("Recebido: profession and feature recebidos com sucesso");
         String prompt = promptTemplateService.buildPrompt(dto.getProfession(), dto.getFeature(), dto.getDescription());
         String result = geminiService.sendPrompt(prompt);
-        logger.info("Resultado da IA: {}", result);
+        logger.info("Resultado da IA gerado com sucesso");
         return ResponseEntity.ok()
                 .contentType(MediaType.TEXT_PLAIN)
                 .body(result);
