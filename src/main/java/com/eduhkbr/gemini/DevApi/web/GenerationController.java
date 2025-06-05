@@ -29,7 +29,10 @@ public class GenerationController {
    */
   @PostMapping
   public ResponseEntity<GenerationResult> analyze(@Valid @RequestBody JavaClassDTO dto) {
-    JavaClass javaClass = new JavaClass(dto.getName(), dto.getSourceCode());
+    if(dto == null || dto.getName() == null || dto.getSourceCode() == null) {
+      return ResponseEntity.badRequest().build();
+    }
+    JavaClass javaClass = new JavaClass(dto.getName(), dto.getSourceCode().replaceAll("[\n\r]", "_"));
     GenerationResult result = analyzer.analyze(javaClass);
     return ResponseEntity.ok(result);
   }
