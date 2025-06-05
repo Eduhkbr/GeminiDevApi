@@ -26,4 +26,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=dev
       - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - BASE_URL_IA=${BASE_URL_IA}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
+      - MODEL_IA_NAME=${MODEL_IA_NAME}
     restart: unless-stopped

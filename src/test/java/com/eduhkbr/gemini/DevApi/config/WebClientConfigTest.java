@@ -12,7 +12,7 @@ class WebClientConfigTest {
     @DisplayName("Deve criar WebClient.Builder com baseUrl e header JSON")
     void testWebClientBuilder() {
         GeminiProperties props = mock(GeminiProperties.class);
-        when(props.getBaseUrl()).thenReturn("https://api.fake.com");
+        when(props.getBaseUrl()).thenReturn("${CORS_ALLOWED_ORIGINS:}");
         WebClientConfig config = new WebClientConfig(props);
         WebClient.Builder builder = config.webClientBuilder();
         WebClient client = builder.build();

@@ -46,6 +46,8 @@ const jsonResult = document.getElementById('jsonResult');
 const analyzeMsg = document.getElementById('analyzeMsg');
 const historyBox = document.getElementById('historyBox');
 const historyList = document.getElementById('historyList');
+const mdResult = document.getElementById('mdResult');
+const mdResultProf = document.getElementById('mdResultProf');
 
 // Função para formatar e colapsar JSON
 function syntaxHighlight(json) {
@@ -128,6 +130,7 @@ if (analyzeBtn) {
         const payload = JSON.stringify(payloadObj);
         if (analyzeMsg) analyzeMsg.innerHTML = '<span class="success">Enviando...</span>';
         if (jsonResult) jsonResult.textContent = '';
+        if (mdResult) mdResult.innerHTML = '';
         try {
             const resp = await fetch('/v1/analyze', {
                 method: 'POST',
@@ -140,8 +143,15 @@ if (analyzeBtn) {
                 json = JSON.parse(text);
                 if (jsonResult) jsonResult.innerHTML = syntaxHighlight(json);
                 setTimeout(() => makeCollapsible(jsonResult), 100);
+                // Extrai o markdown do campo text
+                let md = '';
+                if (json && json.candidates && json.candidates[0] && json.candidates[0].content && json.candidates[0].content.parts && json.candidates[0].content.parts[0] && json.candidates[0].content.parts[0].text) {
+                    md = json.candidates[0].content.parts[0].text;
+                }
+                if (mdResult) mdResult.innerHTML = window.marked ? marked.parse(md) : md;
             } catch {
                 if (jsonResult) jsonResult.textContent = text;
+                if (mdResult) mdResult.innerHTML = '';
             }
             if (resp.ok) {
                 if (analyzeMsg) analyzeMsg.innerHTML = '<span class="success">Requisição realizada com sucesso!</span>';
@@ -154,3 +164,106 @@ if (analyzeBtn) {
         }
     };
 }
+
+// --- INTEGRAÇÃO NOVO FLUXO GEMINI ---
+async function loadProfessions() {
+    const jwtToken = sessionStorage.getItem('jwt') || '';
+    const resp = await fetch('/api/professions', {
+        headers: { 'Authorization': 'Bearer ' + jwtToken }
+    });
+    const data = await resp.json();
+    const select = document.getElementById('professionSelect');
+    select.innerHTML = '<option value="">Selecione...</option>';
+    data.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = p.name;
+        opt.dataset.features = JSON.stringify(p.features || []);
+        select.appendChild(opt);
+    });
+}
+
+async function loadFeatures(professionId) {
+    const select = document.getElementById('featureSelect');
+    select.innerHTML = '<option value="">Selecione...</option>';
+    const professionSelect = document.getElementById('professionSelect');
+    const selectedOption = professionSelect.options[professionSelect.selectedIndex];
+    const features = JSON.parse(selectedOption.dataset.features || '[]');
+    features.forEach(f => {
+        const opt = document.createElement('option');
+        opt.value = f.name;
+        opt.textContent = f.name;
+        select.appendChild(opt);
+    });
+}
+
+const professionSelect = document.getElementById('professionSelect');
+if (professionSelect) {
+    professionSelect.onchange = function() {
+        loadFeatures(this.value);
+    };
+}
+
+const promptAnalyzeBtn = document.getElementById('promptAnalyzeBtn');
+if (promptAnalyzeBtn) {
+    promptAnalyzeBtn.onclick = async function() {
+        const professionId = document.getElementById('professionSelect').value;
+        const professionName = document.getElementById('professionSelect').selectedOptions[0]?.textContent;
+        const feature = document.getElementById('featureSelect').value;
+        const description = document.getElementById('requestDescription').value;
+        const msg = document.getElementById('promptAnalyzeMsg');
+        const result = document.getElementById('promptAnalyzeResult');
+        const mdResultProf = document.getElementById('mdResultProf');
+        if (!professionId || !feature || !description) {
+            msg.innerHTML = '<span class="error">Preencha todos os campos.</span>';
+            return;
+        }
+        msg.innerHTML = 'Enviando...';
+        result.textContent = '';
+        if (mdResultProf) mdResultProf.innerHTML = '';
+        const payload = {
+            profession: professionName,
+            feature,
+            description
+        };
+        const jwtToken = sessionStorage.getItem('jwt') || '';
+        const resp = await fetch('/v1/prompt-analyze', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + jwtToken, 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const text = await resp.text();
+        let json;
+        try {
+            json = JSON.parse(text);
+            result.textContent = JSON.stringify(json, null, 2);
+            // Extrai o markdown do campo text
+            let md = '';
+            if (json && json.candidates && json.candidates[0] && json.candidates[0].content && json.candidates[0].content.parts && json.candidates[0].content.parts[0] && json.candidates[0].content.parts[0].text) {
+                md = json.candidates[0].content.parts[0].text;
+            }
+            if (mdResultProf) mdResultProf.innerHTML = window.marked ? marked.parse(md) : md;
+        } catch {
+            result.textContent = text;
+            if (mdResultProf) mdResultProf.innerHTML = '';
+        }
+        if (resp.ok) {
+            msg.innerHTML = '<span class="success">Resposta recebida!</span>';
+        } else {
+            msg.innerHTML = '<span class="error">Erro: ' + text + '</span>';
+        }
+    };
+}
+
+// Adiciona JWT em todas as requisições fetch
+const originalFetch = window.fetch;
+window.fetch = async function(input, init = {}) {
+    const jwtToken = sessionStorage.getItem('jwt') || '';
+    if (!init.headers) init.headers = {};
+    if (jwtToken && !init.headers['Authorization']) {
+        init.headers['Authorization'] = 'Bearer ' + jwtToken;
+    }
+    return originalFetch(input, init);
+};
+
+window.addEventListener('DOMContentLoaded', loadProfessions);

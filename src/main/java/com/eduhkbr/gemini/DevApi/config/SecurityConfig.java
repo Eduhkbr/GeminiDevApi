@@ -33,6 +33,9 @@ public class SecurityConfig {
                     "/login.html", "/app.html", "/app.js", "/favicon.ico", "/css/**", "/js/**", "/static/**",
                     "/h2-console/**"
                 ).permitAll()
+                .requestMatchers("/admin.html", "/admin.js", "/api/users/**").hasRole("ADMIN")
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/professions/**", "/api/features/**").hasAnyRole("ADMIN", "USER")
+                .requestMatchers("/api/professions/**", "/api/features/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .exceptionHandling(exception -> exception

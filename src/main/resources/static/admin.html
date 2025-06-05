@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Administração - GeminiDevApi</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #181c1f; color: #e0e0e0; }
+        .container { max-width: 900px; margin: 40px auto; background: #23272a; padding: 2em; border-radius: 8px; }
+        h2, h3 { text-align: center; }
+        .tabs { display: flex; gap: 1em; justify-content: center; margin-bottom: 2em; }
+        .tab-btn { background: #444; color: #fff; border: none; padding: 0.7em 2em; border-radius: 4px; cursor: pointer; }
+        .tab-btn.active { background: #4e9cff; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1em; }
+        th, td { border: 1px solid #333; padding: 0.5em; text-align: left; }
+        th { background: #222; }
+        input, select, button { margin: 0.2em 0; padding: 0.5em; border-radius: 4px; border: 1px solid #444; background: #181c1f; color: #e0e0e0; }
+        .actions button { margin-right: 0.5em; }
+        .success { color: #4caf50; }
+        .error { color: #ff5252; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Painel Administrativo</h2>
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="usuarios">Usuários</button>
+        <button class="tab-btn" data-tab="profissoes">Profissões</button>
+        <button class="tab-btn" data-tab="funcionalidades">Funcionalidades</button>
+    </div>
+    <div id="tab-usuarios" class="tab-content active">
+        <h3>Gerenciar Usuários</h3>
+        <div id="userMsg"></div>
+        <table id="userTable"><thead><tr><th>ID</th><th>Usuário</th><th>Role</th><th class="actions">Ações</th></tr></thead><tbody></tbody></table>
+        <h4>Novo Usuário</h4>
+        <input id="newUsername" placeholder="Usuário" />
+        <input id="newPassword" type="password" placeholder="Senha" />
+        <select id="newUserRole"><option value="ROLE_USER">Usuário</option><option value="ROLE_ADMIN">Admin</option></select>
+        <button id="addUserBtn">Adicionar</button>
+    </div>
+    <div id="tab-profissoes" class="tab-content">
+        <h3>Gerenciar Profissões</h3>
+        <div id="profMsg"></div>
+        <table id="profTable"><thead><tr><th>ID</th><th>Nome</th><th class="actions">Ações</th></tr></thead><tbody></tbody></table>
+        <h4>Nova Profissão</h4>
+        <input id="newProfName" placeholder="Nome da profissão" />
+        <button id="addProfBtn">Adicionar</button>
+    </div>
+    <div id="tab-funcionalidades" class="tab-content">
+        <h3>Gerenciar Funcionalidades</h3>
+        <div id="featMsg"></div>
+        <table id="featTable"><thead><tr><th>ID</th><th>Nome</th><th>Profissão</th><th class="actions">Ações</th></tr></thead><tbody></tbody></table>
+        <h4>Nova Funcionalidade</h4>
+        <input id="newFeatName" placeholder="Nome da funcionalidade" />
+        <select id="newFeatProf"></select>
+        <button id="addFeatBtn">Adicionar</button>
+    </div>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>
