@@ -28,7 +28,10 @@ public class PromptAnalyzeController {
     public ResponseEntity<String> analyze(@Valid @RequestBody PromptRequestDTO dto) {
         // Log seguro: não loga dados controlados pelo usuário diretamente
         logger.info("Recebido: profession and feature recebidos com sucesso");
-        String prompt = promptTemplateService.buildPrompt(dto.getProfession(), dto.getFeature(), dto.getDescription());
+        String profession = dto.getProfession().replaceAll("[<>\"'\\\\]", "");
+        String feature = dto.getFeature().replaceAll("[<>\"'\\\\]", "");
+        String description = dto.getDescription().replaceAll("[<>\"'\\\\]", "");
+        String prompt = promptTemplateService.buildPrompt(profession, feature, description);
         String result = geminiService.sendPrompt(prompt);
         logger.info("Resultado da IA gerado com sucesso");
         return ResponseEntity.ok()

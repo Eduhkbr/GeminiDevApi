@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
+import java.util.Map;
+
 /**
  * Controller REST para análise de classes Java.
  * Recebe uma lista de DTOs e retorna documentação e testes gerados.
@@ -28,20 +30,21 @@ public class GenerationController {
    * @return resultado de geração
    */
   @PostMapping
-  public ResponseEntity<GenerationResult> analyze(@Valid @RequestBody JavaClassDTO dto) {
+  public ResponseEntity<?> analyze(@Valid @RequestBody JavaClassDTO dto) {
     if (dto == null || dto.getName() == null || dto.getSourceCode() == null) {
-      return ResponseEntity.badRequest().build();
+      return ResponseEntity.badRequest().body(Map.of("error", "Dados obrigatórios ausentes"));
     }
     // Validação extra: limita tamanho do código e nome, impede caracteres suspeitos
     if (dto.getName().length() > 100 || dto.getSourceCode().length() > 20000) {
-      return ResponseEntity.badRequest().body(null);
+      return ResponseEntity.badRequest().body(Map.of("error", "Nome ou código muito longo"));
     }
     if (!dto.getName().matches("^[\\w.\\- ]+$")) {
-      return ResponseEntity.badRequest().body(null);
+      return ResponseEntity.badRequest().body(Map.of("error", "Nome inválido"));
     }
     // Remove caracteres de controle e normaliza o código
-    String safeSource = dto.getSourceCode().replaceAll("[\\p{Cntrl}&&[^\n\t]]", "");
-    JavaClass javaClass = new JavaClass(dto.getName(), safeSource);
+    String safeName = dto.getName().replaceAll("[<>\"'\\\\]", "");
+    String safeSource = dto.getSourceCode().replaceAll("[<>\"'\\\\]", "").replaceAll("[\\p{Cntrl}&&[^\n\t]]", "");
+    JavaClass javaClass = new JavaClass(safeName, safeSource);
     GenerationResult result = analyzer.analyze(javaClass);
     return ResponseEntity.ok(result);
   }

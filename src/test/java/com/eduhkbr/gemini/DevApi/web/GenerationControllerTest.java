@@ -34,7 +34,7 @@ class GenerationControllerTest {
         JavaClass javaClass = new JavaClass(dto.getName(), dto.getSourceCode());
         GenerationResult result = mock(GenerationResult.class);
         when(analyzer.analyze(any(JavaClass.class))).thenReturn(result);
-        ResponseEntity<GenerationResult> response = generationController.analyze(dto);
+        ResponseEntity<?> response = generationController.analyze(dto);
         assertEquals(200, response.getStatusCodeValue());
         assertEquals(result, response.getBody());
         verify(analyzer, times(1)).analyze(any(JavaClass.class));

@@ -25,11 +25,16 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody Map<String, String> loginData) {
         String username = loginData.get("username");
         String password = loginData.get("password");
+        if (username == null || password == null || username.isBlank() || password.isBlank()) {
+            return ResponseEntity.status(401).body(Map.of("error", "Credenciais inválidas"));
+        }
+        username = username.replaceAll("[<>\"'\\\\]", "");
         Optional<User> userOpt = userRepository.findByUsername(username);
         if (userOpt.isPresent() && passwordEncoder.matches(password, userOpt.get().getPasswordHash())) {
             String token = jwtUtil.generateToken(username, userOpt.get().getRole());
             return ResponseEntity.ok(Map.of("token", token));
         }
-        return ResponseEntity.status(401).body(Map.of("error", "Usuário ou senha inválidos"));
+        // Mensagem genérica para evitar enumeração de usuários
+        return ResponseEntity.status(401).body(Map.of("error", "Credenciais inválidas"));
     }
 }

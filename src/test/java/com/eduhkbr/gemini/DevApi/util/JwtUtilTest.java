@@ -64,4 +64,81 @@ class JwtUtilTest {
         String invalidToken = "invalid.token.value";
         assertFalse(jwtUtil.isTokenValid(invalidToken));
     }
+
+    @Test
+    void testExtractRoleWithList() {
+        String token = Jwts.builder()
+                .setSubject("user")
+                .claim("roles", java.util.Arrays.asList("ROLE_ADMIN"))
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 10000))
+                .signWith(SignatureAlgorithm.HS256, "chave-secreta-teste")
+                .compact();
+        try {
+            java.lang.reflect.Field secretKeyField = JwtUtil.class.getDeclaredField("SECRET_KEY");
+            secretKeyField.setAccessible(true);
+            secretKeyField.set(jwtUtil, "chave-secreta-teste");
+        } catch (Exception e) { throw new RuntimeException(e); }
+        assertEquals("ROLE_ADMIN", jwtUtil.extractRole(token));
+    }
+
+    @Test
+    void testExtractRoleWithString() {
+        String token = Jwts.builder()
+                .setSubject("user")
+                .claim("roles", "ROLE_MANAGER")
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 10000))
+                .signWith(SignatureAlgorithm.HS256, "chave-secreta-teste")
+                .compact();
+        try {
+            java.lang.reflect.Field secretKeyField = JwtUtil.class.getDeclaredField("SECRET_KEY");
+            secretKeyField.setAccessible(true);
+            secretKeyField.set(jwtUtil, "chave-secreta-teste");
+        } catch (Exception e) { throw new RuntimeException(e); }
+        assertEquals("ROLE_MANAGER", jwtUtil.extractRole(token));
+    }
+
+    @Test
+    void testExtractRoleWithNull() {
+        String token = Jwts.builder()
+                .setSubject("user")
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 10000))
+                .signWith(SignatureAlgorithm.HS256, "chave-secreta-teste")
+                .compact();
+        try {
+            java.lang.reflect.Field secretKeyField = JwtUtil.class.getDeclaredField("SECRET_KEY");
+            secretKeyField.setAccessible(true);
+            secretKeyField.set(jwtUtil, "chave-secreta-teste");
+        } catch (Exception e) { throw new RuntimeException(e); }
+        assertNull(jwtUtil.extractRole(token));
+    }
+
+    @Test
+    void testExtractRoleWithUnexpectedType() {
+        String token = Jwts.builder()
+                .setSubject("user")
+                .claim("roles", 12345)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 10000))
+                .signWith(SignatureAlgorithm.HS256, "chave-secreta-teste")
+                .compact();
+        try {
+            java.lang.reflect.Field secretKeyField = JwtUtil.class.getDeclaredField("SECRET_KEY");
+            secretKeyField.setAccessible(true);
+            secretKeyField.set(jwtUtil, "chave-secreta-teste");
+        } catch (Exception e) { throw new RuntimeException(e); }
+        assertNull(jwtUtil.extractRole(token));
+    }
+
+    @Test
+    void testExtractUsernameWithInvalidToken() {
+        assertThrows(Exception.class, () -> jwtUtil.extractUsername("invalid.token"));
+    }
+
+    @Test
+    void testExtractRoleWithInvalidToken() {
+        assertThrows(Exception.class, () -> jwtUtil.extractRole("invalid.token"));
+    }
 }
