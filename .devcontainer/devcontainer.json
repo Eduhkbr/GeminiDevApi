@@ -1,0 +1,24 @@
+{
+  "name": "GeminiDevApi Java 21 + Maven",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".",
+    "args": {
+      "VARIANT": "21"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "java.configuration.runtimes": [
+          {
+            "name": "JavaSE-21",
+            "path": "/usr/lib/jvm/msopenjdk-21",
+            "default": true
+          }
+        ]
+      }
+    }
+  },
+  "postCreateCommand": "mvn --version"
+}
