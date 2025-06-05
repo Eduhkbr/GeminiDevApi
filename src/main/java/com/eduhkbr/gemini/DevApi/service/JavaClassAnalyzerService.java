@@ -80,7 +80,7 @@ public class JavaClassAnalyzerService {
     }
     try {
       logger.info("Template de testes: {}", testTemplate);
-      logger.info("Argumentos: nome={}, sourceCode={} ", javaClass.getName(), javaClass.getSourceCode());
+      logger.info("Argumentos: nome={} (sourceCode omitido por segurança)", javaClass.getName());
       promptTest = String.format(testTemplate, javaClass.getName(), javaClass.getSourceCode());
       tests = llm.sendPrompt(promptTest);
     } catch (MissingFormatArgumentException e) {
