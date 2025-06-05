@@ -73,4 +73,60 @@ class AuthControllerTest {
         Map<?, ?> bodyInvalid = (Map<?, ?>) response.getBody();
         assertThat(bodyInvalid != null && bodyInvalid.get("error") != null).isTrue();
     }
+
+    @Test
+    @DisplayName("login - username nulo retorna 401")
+    void login_quandoUsernameNulo_entaoRetorna401() {
+        ResponseEntity<?> response = authController.login(Map.of("password", "123"));
+        assertThat(response.getStatusCode()).isEqualTo(org.springframework.http.HttpStatus.UNAUTHORIZED);
+        assertThat(response.getBody()).isInstanceOf(Map.class);
+        Map<?, ?> body = (Map<?, ?>) response.getBody();
+        assertThat(body != null && body.get("error") != null).isTrue();
+    }
+
+    @Test
+    @DisplayName("login - password nulo retorna 401")
+    void login_quandoPasswordNulo_entaoRetorna401() {
+        ResponseEntity<?> response = authController.login(Map.of("username", "admin"));
+        assertThat(response.getStatusCode()).isEqualTo(org.springframework.http.HttpStatus.UNAUTHORIZED);
+        assertThat(response.getBody()).isInstanceOf(Map.class);
+        Map<?, ?> body = (Map<?, ?>) response.getBody();
+        assertThat(body != null && body.get("error") != null).isTrue();
+    }
+
+    @Test
+    @DisplayName("login - username em branco retorna 401")
+    void login_quandoUsernameEmBranco_entaoRetorna401() {
+        ResponseEntity<?> response = authController.login(Map.of("username", " ", "password", "123"));
+        assertThat(response.getStatusCode()).isEqualTo(org.springframework.http.HttpStatus.UNAUTHORIZED);
+        assertThat(response.getBody()).isInstanceOf(Map.class);
+        Map<?, ?> body = (Map<?, ?>) response.getBody();
+        assertThat(body != null && body.get("error") != null).isTrue();
+    }
+
+    @Test
+    @DisplayName("login - password em branco retorna 401")
+    void login_quandoPasswordEmBranco_entaoRetorna401() {
+        ResponseEntity<?> response = authController.login(Map.of("username", "admin", "password", " "));
+        assertThat(response.getStatusCode()).isEqualTo(org.springframework.http.HttpStatus.UNAUTHORIZED);
+        assertThat(response.getBody()).isInstanceOf(Map.class);
+        Map<?, ?> body = (Map<?, ?>) response.getBody();
+        assertThat(body != null && body.get("error") != null).isTrue();
+    }
+
+    @Test
+    @DisplayName("login - username com caracteres especiais é sanitizado")
+    void login_quandoUsernameComCaracteresEspeciais_entaoSanitiza() {
+        User user = new User();
+        user.setUsername("admin");
+        user.setPasswordHash("hash");
+        user.setRole("ROLE_ADMIN");
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("123", "hash")).thenReturn(true);
+        when(jwtUtil.generateToken("admin", "ROLE_ADMIN")).thenReturn("token.jwt");
+        ResponseEntity<?> response = authController.login(Map.of("username", "ad<min>", "password", "123"));
+        assertThat(response.getStatusCode()).isEqualTo(org.springframework.http.HttpStatus.OK);
+        Map<?, ?> bodyOk = (Map<?, ?>) response.getBody();
+        assertThat(bodyOk != null && "token.jwt".equals(bodyOk.get("token"))).isTrue();
+    }
 }
