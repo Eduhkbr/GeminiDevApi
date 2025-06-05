@@ -31,6 +31,7 @@ public class GenerationController {
   public ResponseEntity<GenerationResult> analyze(@Valid @RequestBody JavaClassDTO dto) {
     JavaClass javaClass = new JavaClass(dto.getName(), dto.getSourceCode());
     GenerationResult result = analyzer.analyze(javaClass);
+    // Não logar dados controlados pelo usuário
     return ResponseEntity.ok(result);
   }
 }
