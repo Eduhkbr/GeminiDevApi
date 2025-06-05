@@ -2,6 +2,7 @@ package com.eduhkbr.gemini.DevApi.web;
 
 import com.eduhkbr.gemini.DevApi.model.Feature;
 import com.eduhkbr.gemini.DevApi.repository.FeatureRepository;
+import com.eduhkbr.gemini.DevApi.web.dto.FeatureDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -55,30 +57,40 @@ class FeatureControllerTest {
 
     @Test
     void testCreate() {
+        FeatureDTO dto = new FeatureDTO();
+        dto.setName("Nova Feature");
+        dto.setProfessionId(null);
         Feature f = new Feature();
-        when(featureRepository.save(f)).thenReturn(f);
-        Feature result = featureController.create(f);
-        assertEquals(f, result);
+        f.setName("Nova Feature");
+        when(featureRepository.save(any(Feature.class))).thenReturn(f);
+        ResponseEntity<?> response = featureController.create(dto);
+        assertEquals(200, response.getStatusCodeValue());
+        Map<?,?> body = (Map<?,?>) response.getBody();
+        assertEquals("Nova Feature", body.get("name"));
     }
 
     @Test
     void testUpdateFound() {
         Feature existing = new Feature();
         existing.setName("Old");
-        Feature update = new Feature();
+        FeatureDTO update = new FeatureDTO();
         update.setName("New");
+        update.setProfessionId(null);
         when(featureRepository.findById(1L)).thenReturn(Optional.of(existing));
         when(featureRepository.save(existing)).thenReturn(existing);
-        ResponseEntity<Feature> response = featureController.update(1L, update);
+        ResponseEntity<?> response = featureController.update(1L, update);
         assertEquals(200, response.getStatusCodeValue());
-        assertEquals("New", response.getBody().getName());
+        Map<?,?> body = (Map<?,?>) response.getBody();
+        assertEquals("New", body.get("name"));
     }
 
     @Test
     void testUpdateNotFound() {
-        Feature update = new Feature();
+        FeatureDTO update = new FeatureDTO();
+        update.setName("New");
+        update.setProfessionId(null);
         when(featureRepository.findById(1L)).thenReturn(Optional.empty());
-        ResponseEntity<Feature> response = featureController.update(1L, update);
+        ResponseEntity<?> response = featureController.update(1L, update);
         assertEquals(404, response.getStatusCodeValue());
     }
 
