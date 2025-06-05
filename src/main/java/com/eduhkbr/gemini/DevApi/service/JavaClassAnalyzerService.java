@@ -69,7 +69,7 @@ public class JavaClassAnalyzerService {
     String tests = null;
     try {
       logger.info("Template de documentação: {}", docTemplate);
-      logger.info("Argumentos: nome={}, sourceCode={} ", javaClass.getName(), javaClass.getSourceCode());
+      logger.info("Argumentos: nome={} (sourceCode omitido por segurança)", javaClass.getName());
       promptDoc = String.format(docTemplate, javaClass.getName(), javaClass.getSourceCode());
       documentation = llm.sendPrompt(promptDoc);
     } catch (MissingFormatArgumentException e) {
@@ -81,7 +81,7 @@ public class JavaClassAnalyzerService {
     }
     try {
       logger.info("Template de testes: {}", testTemplate);
-      logger.info("Argumentos: nome={}, sourceCode={} ", javaClass.getName(), javaClass.getSourceCode());
+      logger.info("Argumentos: nome={} (sourceCode omitido por segurança)", javaClass.getName());
       promptTest = String.format(testTemplate, javaClass.getName(), javaClass.getSourceCode());
       tests = llm.sendPrompt(promptTest);
     } catch (MissingFormatArgumentException e) {
