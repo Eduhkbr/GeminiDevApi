@@ -255,6 +255,37 @@ if (promptAnalyzeBtn) {
     };
 }
 
+// Função para decodificar JWT e extrair roles
+function parseJwt(token) {
+    if (!token) return null;
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+    } catch { return null; }
+}
+
+function renderNavbar() {
+    const navbar = document.getElementById('navbar');
+    if (!navbar) return;
+    navbar.innerHTML = '';
+    const jwt = sessionStorage.getItem('jwt');
+    const payload = parseJwt(jwt);
+    if (payload && (payload.roles?.includes('ADMIN') || payload.role === 'ROLE_ADMIN' || payload.role === 'ADMIN')) {
+        const adminLink = document.createElement('a');
+        adminLink.href = 'admin.html';
+        adminLink.textContent = 'Administração';
+        adminLink.style.color = '#4e9cff';
+        adminLink.style.fontWeight = 'bold';
+        adminLink.style.textDecoration = 'none';
+        adminLink.style.marginRight = '1em';
+        navbar.appendChild(adminLink);
+    }
+}
+
 // Adiciona JWT em todas as requisições fetch
 const originalFetch = window.fetch;
 window.fetch = async function(input, init = {}) {
@@ -266,4 +297,7 @@ window.fetch = async function(input, init = {}) {
     return originalFetch(input, init);
 };
 
-window.addEventListener('DOMContentLoaded', loadProfessions);
+window.addEventListener('DOMContentLoaded', () => {
+    loadProfessions();
+    renderNavbar();
+});

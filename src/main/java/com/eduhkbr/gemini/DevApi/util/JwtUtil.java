@@ -18,7 +18,7 @@ public class JwtUtil {
     public String generateToken(String username, String role) {
         return Jwts.builder()
                 .setSubject(username)
-                .claim("role", role)
+                .claim("roles", new String[]{role.replace("ROLE_", "")})
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
@@ -30,7 +30,17 @@ public class JwtUtil {
     }
 
     public String extractRole(String token) {
-        return (String) getClaims(token).get("role");
+        Object roles = getClaims(token).get("roles");
+        if (roles instanceof String[]) {
+            String[] arr = (String[]) roles;
+            return arr.length > 0 ? arr[0] : null;
+        } else if (roles instanceof java.util.List) {
+            java.util.List<?> list = (java.util.List<?>) roles;
+            return list.isEmpty() ? null : String.valueOf(list.get(0));
+        } else if (roles instanceof String) {
+            return (String) roles;
+        }
+        return null;
     }
 
     public boolean isTokenValid(String token) {

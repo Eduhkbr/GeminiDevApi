@@ -62,14 +62,13 @@ public class JavaClassAnalyzerService {
     }
     // 2. Chama IA
     iaCallCounter.increment();
-    logger.info("Analisando classe: {} (cache miss)", javaClass.getName());
+    logger.info("Analisando classe do hash: {} (cache miss)", key);
     String promptDoc = null;
     String documentation = null;
     String promptTest = null;
     String tests = null;
     try {
       logger.info("Template de documentação: {}", docTemplate);
-      logger.info("Argumentos: nome={}, sourceCode={} ", javaClass.getName(), javaClass.getSourceCode());
       promptDoc = String.format(docTemplate, javaClass.getName(), javaClass.getSourceCode());
       documentation = llm.sendPrompt(promptDoc);
     } catch (MissingFormatArgumentException e) {
