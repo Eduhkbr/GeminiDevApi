@@ -46,6 +46,8 @@
     </div>
     <h3>Resposta JSON</h3>
     <pre id="jsonResult"></pre>
+    <h3>Resposta Markdown</h3>
+    <div id="mdResult" style="background:#23272a;color:#e0e0e0;padding:1em;border-radius:6px;overflow-x:auto;font-family:'Fira Mono','Consolas',monospace;font-size:1em;"></div>
 
     <label for="professionSelect">Profissão:</label>
     <select id="professionSelect"></select>
@@ -55,9 +57,14 @@
     <textarea id="requestDescription" rows="4"></textarea>
     <button id="promptAnalyzeBtn">Enviar para IA</button>
     <div id="promptAnalyzeMsg"></div>
+    <h3>Resposta JSON</h3>
     <pre id="promptAnalyzeResult"></pre>
+    <h3>Resposta Markdown</h3>
+    <div id="mdResultProf" style="background:#23272a;color:#e0e0e0;padding:1em;border-radius:6px;overflow-x:auto;font-family:'Fira Mono','Consolas',monospace;font-size:1em;"></div>
+
 </div>
 <script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
 // Redireciona para login se não autenticado
 if (!sessionStorage.getItem('jwt')) {
