@@ -34,6 +34,7 @@ public class SecurityConfig {
                     "/h2-console/**"
                 ).permitAll()
                 .requestMatchers("/admin.html", "/admin.js", "/api/users/**").hasRole("ADMIN")
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/professions/**", "/api/features/**").hasAnyRole("ADMIN", "USER")
                 .requestMatchers("/api/professions/**", "/api/features/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )

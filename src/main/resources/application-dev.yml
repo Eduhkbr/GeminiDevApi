@@ -34,8 +34,8 @@ logging:
     root: DEBUG
     com.eduhkbr.gemini.DevApi: DEBUG
 cors:
-  allowed-origins: '*'
-  allowed-methods: '*'
+  allowed-origins: ${CORS_ALLOWED_ORIGINS}
+  allowed-methods: ${CORS_ALLOWED_METHODS:*}
 custom:
   feature-x-enabled: true
 jwt:

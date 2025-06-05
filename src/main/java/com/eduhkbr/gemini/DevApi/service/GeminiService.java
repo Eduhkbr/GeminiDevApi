@@ -7,10 +7,12 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class GeminiService {
-    @Value("${GEMINI_API_URL:https://api.fake-gemini.com/v1/generate}")
+    @Value("${BASE_URL_IA:}")
     private String geminiApiUrl;
     @Value("${GEMINI_API_KEY:}")
     private String geminiApiKey;
+    @Value("${MODEL_IA_NAME:}")
+    private String modelIaName;
 
     // Implemente a integração real com a API Gemini aqui
     public String sendPrompt(String prompt) {
@@ -22,10 +24,12 @@ public class GeminiService {
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("Authorization", "Bearer " + geminiApiKey);
-            String body = "{\"prompt\": " + toJsonString(prompt) + "}";
+            String url = geminiApiUrl;
+            if (!url.endsWith("/")) url += "/";
+            url += "models/" + modelIaName + ":generateContent?key=" + geminiApiKey;
+            String body = "{\"contents\":[{\"role\":\"user\",\"parts\":[{\"text\":" + toJsonString(prompt) + "}]}]}";
             HttpEntity<String> entity = new HttpEntity<>(body, headers);
-            ResponseEntity<String> response = restTemplate.postForEntity(geminiApiUrl, entity, String.class);
+            ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
             return response.getBody();
         } catch (Exception e) {
             return "[ERRO AO CHAMAR GEMINI] " + e.getMessage();

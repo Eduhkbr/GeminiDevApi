@@ -157,7 +157,10 @@ if (analyzeBtn) {
 
 // --- INTEGRAÇÃO NOVO FLUXO GEMINI ---
 async function loadProfessions() {
-    const resp = await fetch('/api/professions');
+    const jwtToken = sessionStorage.getItem('jwt') || '';
+    const resp = await fetch('/api/professions', {
+        headers: { 'Authorization': 'Bearer ' + jwtToken }
+    });
     const data = await resp.json();
     const select = document.getElementById('professionSelect');
     select.innerHTML = '<option value="">Selecione...</option>';
@@ -165,22 +168,23 @@ async function loadProfessions() {
         const opt = document.createElement('option');
         opt.value = p.id;
         opt.textContent = p.name;
+        opt.dataset.features = JSON.stringify(p.features || []);
         select.appendChild(opt);
     });
 }
 
 async function loadFeatures(professionId) {
-    const resp = await fetch('/api/features');
-    const data = await resp.json();
     const select = document.getElementById('featureSelect');
     select.innerHTML = '<option value="">Selecione...</option>';
-    data.filter(f => f.profession && f.profession.id == professionId)
-        .forEach(f => {
-            const opt = document.createElement('option');
-            opt.value = f.name;
-            opt.textContent = f.name;
-            select.appendChild(opt);
-        });
+    const professionSelect = document.getElementById('professionSelect');
+    const selectedOption = professionSelect.options[professionSelect.selectedIndex];
+    const features = JSON.parse(selectedOption.dataset.features || '[]');
+    features.forEach(f => {
+        const opt = document.createElement('option');
+        opt.value = f.name;
+        opt.textContent = f.name;
+        select.appendChild(opt);
+    });
 }
 
 const professionSelect = document.getElementById('professionSelect');
@@ -224,5 +228,16 @@ if (promptAnalyzeBtn) {
         }
     };
 }
+
+// Adiciona JWT em todas as requisições fetch
+const originalFetch = window.fetch;
+window.fetch = async function(input, init = {}) {
+    const jwtToken = sessionStorage.getItem('jwt') || '';
+    if (!init.headers) init.headers = {};
+    if (jwtToken && !init.headers['Authorization']) {
+        init.headers['Authorization'] = 'Bearer ' + jwtToken;
+    }
+    return originalFetch(input, init);
+};
 
 window.addEventListener('DOMContentLoaded', loadProfessions);

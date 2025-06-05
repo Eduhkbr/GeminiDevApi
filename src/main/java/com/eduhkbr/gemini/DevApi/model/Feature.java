@@ -1,6 +1,7 @@
 package com.eduhkbr.gemini.DevApi.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class Feature {
@@ -10,6 +11,7 @@ public class Feature {
     private String name;
     @ManyToOne
     @JoinColumn(name = "profession_id")
+    @JsonIgnore
     private Profession profession;
 
     // Getters e setters

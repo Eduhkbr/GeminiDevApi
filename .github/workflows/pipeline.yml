@@ -156,7 +156,8 @@ jobs:
             REDIS_USER=${{ secrets.DEVAPI_DB_USER }}
             REDIS_PASSWORD=${{ secrets.DEVAPI_DB_PASS }}
             CORS_ALLOWED_ORIGINS=${{ secrets.CORS_ALLOWED_ORIGINS }}
-
+            BASE_URL_IA=${{ secrets.BASE_URL_IA }}
+            MODEL_IA_NAME=${{ secrets.MODEL_IA_NAME }}
 
 #      - name: Validando a API
 #        run: 'curl "${{ steps.deploy.outputs.url }}"'
