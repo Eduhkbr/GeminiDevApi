@@ -23,6 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.test.context.support.WithMockUser;
 
 @WebMvcTest(ProfessionController.class)
 class ProfessionControllerTest {
@@ -43,6 +44,7 @@ class ProfessionControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
+    @WithMockUser
     void getAll_shouldReturnListOfProfessionsWithFeatures() throws Exception {
         Profession profession = new Profession();
         profession.setId(1L);
@@ -66,6 +68,7 @@ class ProfessionControllerTest {
     }
 
     @Test
+    @WithMockUser
     void getAll_shouldReturnListOfProfessions() throws Exception {
         Profession profession = new Profession();
         profession.setId(1L);
@@ -80,6 +83,7 @@ class ProfessionControllerTest {
     }
     
     @Test
+    @WithMockUser(roles = "ADMIN")
     void create_shouldReturn201Created() throws Exception {
         ProfessionRequestDTO dto = new ProfessionRequestDTO();
         dto.setName("Engenheiro de Dados");

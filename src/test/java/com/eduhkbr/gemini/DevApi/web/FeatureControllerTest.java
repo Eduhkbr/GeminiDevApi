@@ -19,6 +19,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.test.context.support.WithMockUser;
 
 @WebMvcTest(FeatureController.class)
 class FeatureControllerTest {
@@ -39,6 +40,7 @@ class FeatureControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void create_withValidData_shouldReturn201Created() throws Exception {
         FeatureRequestDTO dto = new FeatureRequestDTO();
         dto.setName("Test Feature");
@@ -65,6 +67,7 @@ class FeatureControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void create_withInvalidData_shouldReturn400BadRequest() throws Exception {
         // Arrange
         FeatureRequestDTO dtoWithBlankName = new FeatureRequestDTO();
