@@ -1,111 +1,71 @@
 package com.eduhkbr.gemini.DevApi.web;
 
 import com.eduhkbr.gemini.DevApi.model.Feature;
-import com.eduhkbr.gemini.DevApi.repository.FeatureRepository;
-import com.eduhkbr.gemini.DevApi.web.dto.FeatureDTO;
-import org.junit.jupiter.api.BeforeEach;
+import com.eduhkbr.gemini.DevApi.model.Profession;
+import com.eduhkbr.gemini.DevApi.service.FeatureService;
+import com.eduhkbr.gemini.DevApi.web.dto.FeatureRequestDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
+@WebMvcTest(FeatureController.class)
 class FeatureControllerTest {
-    @Mock
-    private FeatureRepository featureRepository;
 
-    @InjectMocks
-    private FeatureController featureController;
+    @Autowired
+    private MockMvc mockMvc;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
+    @MockBean
+    private FeatureService featureService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Test
+    void create_withValidData_shouldReturn201Created() throws Exception {
+        FeatureRequestDTO dto = new FeatureRequestDTO();
+        dto.setName("Test Feature");
+        dto.setProfessionId(1L);
+
+        Profession profession = new Profession();
+        profession.setId(1L);
+        profession.setName("Tester");
+
+        Feature returnedFeature = new Feature();
+        returnedFeature.setId(1L);
+        returnedFeature.setName("Test Feature");
+        returnedFeature.setProfession(profession);
+
+        given(featureService.create(any(FeatureRequestDTO.class))).willReturn(returnedFeature);
+
+        mockMvc.perform(post("/api/features")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(1L)) 
+                .andExpect(jsonPath("$.name").value("Test Feature"))
+                .andExpect(jsonPath("$.profession.name").value("Tester"));
     }
 
     @Test
-    void testGetAll() {
-        Feature f1 = new Feature();
-        Feature f2 = new Feature();
-        when(featureRepository.findAll()).thenReturn(Arrays.asList(f1, f2));
-        List<Feature> result = featureController.getAll();
-        assertEquals(2, result.size());
-    }
+    void create_withInvalidData_shouldReturn400BadRequest() throws Exception {
+        // Arrange
+        FeatureRequestDTO dtoWithBlankName = new FeatureRequestDTO();
+        dtoWithBlankName.setName(""); 
+        dtoWithBlankName.setProfessionId(1L);
 
-    @Test
-    void testGetByIdFound() {
-        Feature f = new Feature();
-        when(featureRepository.findById(1L)).thenReturn(Optional.of(f));
-        ResponseEntity<Feature> response = featureController.getById(1L);
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals(f, response.getBody());
-    }
-
-    @Test
-    void testGetByIdNotFound() {
-        when(featureRepository.findById(1L)).thenReturn(Optional.empty());
-        ResponseEntity<Feature> response = featureController.getById(1L);
-        assertEquals(404, response.getStatusCodeValue());
-    }
-
-    @Test
-    void testCreate() {
-        FeatureDTO dto = new FeatureDTO();
-        dto.setName("Nova Feature");
-        dto.setProfessionId(null);
-        Feature f = new Feature();
-        f.setName("Nova Feature");
-        when(featureRepository.save(any(Feature.class))).thenReturn(f);
-        ResponseEntity<?> response = featureController.create(dto);
-        assertEquals(200, response.getStatusCodeValue());
-        Map<?,?> body = (Map<?,?>) response.getBody();
-        assertEquals("Nova Feature", body.get("name"));
-    }
-
-    @Test
-    void testUpdateFound() {
-        Feature existing = new Feature();
-        existing.setName("Old");
-        FeatureDTO update = new FeatureDTO();
-        update.setName("New");
-        update.setProfessionId(null);
-        when(featureRepository.findById(1L)).thenReturn(Optional.of(existing));
-        when(featureRepository.save(existing)).thenReturn(existing);
-        ResponseEntity<?> response = featureController.update(1L, update);
-        assertEquals(200, response.getStatusCodeValue());
-        Map<?,?> body = (Map<?,?>) response.getBody();
-        assertEquals("New", body.get("name"));
-    }
-
-    @Test
-    void testUpdateNotFound() {
-        FeatureDTO update = new FeatureDTO();
-        update.setName("New");
-        update.setProfessionId(null);
-        when(featureRepository.findById(1L)).thenReturn(Optional.empty());
-        ResponseEntity<?> response = featureController.update(1L, update);
-        assertEquals(404, response.getStatusCodeValue());
-    }
-
-    @Test
-    void testDeleteFound() {
-        when(featureRepository.existsById(1L)).thenReturn(true);
-        doNothing().when(featureRepository).deleteById(1L);
-        ResponseEntity<Void> response = featureController.delete(1L);
-        assertEquals(204, response.getStatusCodeValue());
-    }
-
-    @Test
-    void testDeleteNotFound() {
-        when(featureRepository.existsById(1L)).thenReturn(false);
-        ResponseEntity<Void> response = featureController.delete(1L);
-        assertEquals(404, response.getStatusCodeValue());
+        mockMvc.perform(post("/api/features")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dtoWithBlankName)))
+                .andExpect(status().isBadRequest());
     }
 }

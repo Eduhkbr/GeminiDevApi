@@ -44,6 +44,11 @@ jwt:
   secret-key: ${JWT_SECRET_KEY}
   expiration: 3600000
 
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    custom-js: /swagger-auth.js
+
 server:
   port: 8080
 

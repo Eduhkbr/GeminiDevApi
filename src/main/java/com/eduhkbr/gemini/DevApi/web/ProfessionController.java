@@ -1,67 +1,56 @@
 package com.eduhkbr.gemini.DevApi.web;
 
 import com.eduhkbr.gemini.DevApi.model.Profession;
-import com.eduhkbr.gemini.DevApi.repository.ProfessionRepository;
-import com.eduhkbr.gemini.DevApi.web.dto.ProfessionDTO;
+import com.eduhkbr.gemini.DevApi.service.ProfessionService;
+import com.eduhkbr.gemini.DevApi.web.dto.ProfessionRequestDTO;
+import com.eduhkbr.gemini.DevApi.web.dto.ProfessionResponseDTO;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/professions")
 public class ProfessionController {
-    private final ProfessionRepository professionRepository;
+    
+    private final ProfessionService professionService;
 
-    public ProfessionController(ProfessionRepository professionRepository) {
-        this.professionRepository = professionRepository;
+    public ProfessionController(ProfessionService professionService) {
+        this.professionService = professionService;
     }
 
     @GetMapping
-    public List<Profession> getAll() {
-        return professionRepository.findAll();
+    public ResponseEntity<List<ProfessionResponseDTO>> getAll() {
+        List<ProfessionResponseDTO> professions = professionService.findAll().stream()
+                .map(ProfessionResponseDTO::fromEntity)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(professions);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Profession> getById(@PathVariable Long id) {
-        return professionRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<ProfessionResponseDTO> getById(@PathVariable Long id) {
+        Profession profession = professionService.findById(id);
+        return ResponseEntity.ok(ProfessionResponseDTO.fromEntity(profession));
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@Valid @RequestBody ProfessionDTO dto) {
-        String safeName = dto.getName().replaceAll("[<>\"'\\\\]", "");
-        if (safeName.isBlank()) return ResponseEntity.badRequest().body("Nome inválido");
-        Profession profession = new Profession();
-        profession.setName(safeName);
-        Profession saved = professionRepository.save(profession);
-        Long id = saved.getId() != null ? saved.getId() : -1L;
-        String name = saved.getName() != null ? saved.getName() : "";
-        return ResponseEntity.ok(Map.of("id", id, "name", name));
+    public ResponseEntity<ProfessionResponseDTO> create(@Valid @RequestBody ProfessionRequestDTO dto) {
+        Profession savedProfession = professionService.create(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ProfessionResponseDTO.fromEntity(savedProfession));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody ProfessionDTO dto) {
-        return professionRepository.findById(id)
-                .map(existing -> {
-                    String safeName = dto.getName().replaceAll("[<>\"'\\\\]", "");
-                    if (safeName.isBlank()) return ResponseEntity.badRequest().body("Nome inválido");
-                    existing.setName(safeName);
-                    Profession saved = professionRepository.save(existing);
-                    Long retId = saved.getId() != null ? saved.getId() : -1L;
-                    String retName = saved.getName() != null ? saved.getName() : "";
-                    return ResponseEntity.ok(Map.of("id", retId, "name", retName));
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<ProfessionResponseDTO> update(@PathVariable Long id, @Valid @RequestBody ProfessionRequestDTO dto) {
+        Profession updatedProfession = professionService.update(id, dto);
+        return ResponseEntity.ok(ProfessionResponseDTO.fromEntity(updatedProfession));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        if (!professionRepository.existsById(id)) return ResponseEntity.notFound().build();
-        professionRepository.deleteById(id);
+        professionService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

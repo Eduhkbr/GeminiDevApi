@@ -2,61 +2,148 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Administração - GeminiDevApi</title>
+    <title>Administração - Gemini API</title>
+    <link rel="stylesheet" href="css/style.css">
+    
     <style>
-        body { font-family: Arial, sans-serif; background: #181c1f; color: #e0e0e0; }
-        .container { max-width: 900px; margin: 40px auto; background: #23272a; padding: 2em; border-radius: 8px; }
-        h2, h3 { text-align: center; }
-        .tabs { display: flex; gap: 1em; justify-content: center; margin-bottom: 2em; }
-        .tab-btn { background: #444; color: #fff; border: none; padding: 0.7em 2em; border-radius: 4px; cursor: pointer; }
-        .tab-btn.active { background: #4e9cff; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 1em; }
-        th, td { border: 1px solid #333; padding: 0.5em; text-align: left; }
-        th { background: #222; }
-        input, select, button { margin: 0.2em 0; padding: 0.5em; border-radius: 4px; border: 1px solid #444; background: #181c1f; color: #e0e0e0; }
-        .actions button { margin-right: 0.5em; }
-        .success { color: #4caf50; }
-        .error { color: #ff5252; }
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #444;
+            margin-bottom: 1.5em;
+        }
+        .tab-btn {
+            padding: 0.8em 1.2em;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: #e0e0e0;
+            font-size: 1em;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+        body.light .tab-btn {
+            color: #333;
+        }
+        .tab-btn.active {
+            border-color: #4e9cff;
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .crud-form {
+            background: #2c3135;
+            padding: 1.5em;
+            border-radius: 6px;
+            margin-bottom: 1.5em;
+        }
+        body.light .crud-form {
+            background: #f0f0f0;
+        }
+        .crud-form input, .crud-form select, .crud-form button {
+            margin-right: 1em;
+            width: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1em;
+        }
+        th, td {
+            border: 1px solid #444;
+            padding: 0.8em;
+            text-align: left;
+        }
+        body.light th, body.light td {
+            border-color: #ddd;
+        }
+        th {
+            background-color: #2c3135;
+        }
+        body.light th {
+            background-color: #f2f2f2;
+        }
+        .actions button {
+            width: auto;
+            padding: 0.3em 0.8em;
+            background-color: #c00;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
+
+<header id="app-header"></header>
+
 <div class="container">
-    <h2>Painel Administrativo</h2>
-    <div class="tabs">
-        <button class="tab-btn active" data-tab="usuarios">Usuários</button>
-        <button class="tab-btn" data-tab="profissoes">Profissões</button>
-        <button class="tab-btn" data-tab="funcionalidades">Funcionalidades</button>
-    </div>
-    <div id="tab-usuarios" class="tab-content active">
-        <h3>Gerenciar Usuários</h3>
-        <div id="userMsg"></div>
-        <table id="userTable"><thead><tr><th>ID</th><th>Usuário</th><th>Role</th><th class="actions">Ações</th></tr></thead><tbody></tbody></table>
-        <h4>Novo Usuário</h4>
-        <input id="newUsername" placeholder="Usuário" />
-        <input id="newPassword" type="password" placeholder="Senha" />
-        <select id="newUserRole"><option value="ROLE_USER">Usuário</option><option value="ROLE_ADMIN">Admin</option></select>
-        <button id="addUserBtn">Adicionar</button>
-    </div>
-    <div id="tab-profissoes" class="tab-content">
-        <h3>Gerenciar Profissões</h3>
-        <div id="profMsg"></div>
-        <table id="profTable"><thead><tr><th>ID</th><th>Nome</th><th class="actions">Ações</th></tr></thead><tbody></tbody></table>
-        <h4>Nova Profissão</h4>
-        <input id="newProfName" placeholder="Nome da profissão" />
-        <button id="addProfBtn">Adicionar</button>
-    </div>
-    <div id="tab-funcionalidades" class="tab-content">
-        <h3>Gerenciar Funcionalidades</h3>
-        <div id="featMsg"></div>
-        <table id="featTable"><thead><tr><th>ID</th><th>Nome</th><th>Profissão</th><th class="actions">Ações</th></tr></thead><tbody></tbody></table>
-        <h4>Nova Funcionalidade</h4>
-        <input id="newFeatName" placeholder="Nome da funcionalidade" />
-        <select id="newFeatProf"></select>
-        <button id="addFeatBtn">Adicionar</button>
-    </div>
-</div>
-<script src="admin.js"></script>
+    <h2>Painel de Administração</h2>
+
+    <div class="content-wrapper">
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="users">Usuários</button>
+            <button class="tab-btn" data-tab="professions">Profissões</button>
+            <button class="tab-btn" data-tab="features">Funcionalidades</button>
+        </div>
+
+        <div id="tab-users" class="tab-content active">
+            <h3>Gerenciar Usuários</h3>
+            <div class="crud-form">
+                <input type="text" id="newUsername" placeholder="Novo usuário" required>
+                <input type="password" id="newPassword" placeholder="Senha" required>
+                <select id="newUserRole">
+                    <option value="USER">USER</option>
+                    <option value="ADMIN">ADMIN</option>
+                </select>
+                <button type="button" id="addUserBtn">Adicionar Usuário</button>
+                <div id="userMsg"></div>
+            </div>
+            <table id="userTable">
+                <thead>
+                    <tr><th>ID</th><th>Username</th><th>Role</th><th>Ações</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="tab-professions" class="tab-content">
+            <h3>Gerenciar Profissões</h3>
+             <div class="crud-form">
+                <input type="text" id="newProfName" placeholder="Nome da Profissão">
+                <button type="button" id="addProfBtn">Adicionar Profissão</button>
+                <div id="profMsg"></div> </div>
+            <table id="profTable">
+                <thead>
+                    <tr><th>ID</th><th>Nome</th><th>Ações</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="tab-features" class="tab-content">
+            <h3>Gerenciar Funcionalidades</h3>
+            <div class="crud-form">
+                <input type="text" id="newFeatName" placeholder="Nome da Funcionalidade">
+                <select id="newFeatProf"></select>
+                <button type="button" id="addFeatBtn">Adicionar Funcionalidade</button>
+                <div id="featMsg"></div> </div>
+            <table id="featTable">
+                <thead>
+                    <tr><th>ID</th><th>Nome</th><th>Profissão</th><th>Ações</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+    </div> </div>
+
+<script src="js/auth.js"></script>
+<script src="js/admin.js"></script> 
+
 </body>
 </html>

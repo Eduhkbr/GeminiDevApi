@@ -3,6 +3,8 @@ package com.eduhkbr.gemini.DevApi.model;
 import jakarta.persistence.*;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 @Entity
 public class Profession {
     @Id
@@ -10,6 +12,7 @@ public class Profession {
     private Long id;
     private String name;
     @OneToMany(mappedBy = "profession", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Feature> features;
 
     // Getters e setters

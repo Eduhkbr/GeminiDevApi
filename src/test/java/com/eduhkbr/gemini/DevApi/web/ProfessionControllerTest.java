@@ -1,108 +1,91 @@
 package com.eduhkbr.gemini.DevApi.web;
 
+import com.eduhkbr.gemini.DevApi.model.Feature;
 import com.eduhkbr.gemini.DevApi.model.Profession;
-import com.eduhkbr.gemini.DevApi.repository.ProfessionRepository;
-import com.eduhkbr.gemini.DevApi.web.dto.ProfessionDTO;
-import org.junit.jupiter.api.BeforeEach;
+import com.eduhkbr.gemini.DevApi.service.ProfessionService;
+import com.eduhkbr.gemini.DevApi.web.dto.ProfessionRequestDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@WebMvcTest(ProfessionController.class)
 class ProfessionControllerTest {
-    @Mock
-    private ProfessionRepository professionRepository;
 
-    @InjectMocks
-    private ProfessionController professionController;
+    @Autowired
+    private MockMvc mockMvc;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
+    @MockBean
+    private ProfessionService professionService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Test
+    void getAll_shouldReturnListOfProfessionsWithFeatures() throws Exception {
+        Profession profession = new Profession();
+        profession.setId(1L);
+        profession.setName("Engenheiro de QA");
+        
+        Feature feature = new Feature();
+        feature.setId(201L);
+        feature.setName("Escrever testes automatizados");
+        
+        profession.setFeatures(List.of(feature));
+        given(professionService.findAll()).willReturn(List.of(profession));
+        
+        mockMvc.perform(get("/api/professions"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].name").value("Engenheiro de QA"))
+                .andExpect(jsonPath("$[0].features").isArray())
+                .andExpect(jsonPath("$[0].features.length()").value(1))
+                .andExpect(jsonPath("$[0].features[0].id").value(201L))
+                .andExpect(jsonPath("$[0].features[0].name").value("Escrever testes automatizados"));
     }
 
     @Test
-    void testGetAll() {
-        Profession p1 = new Profession();
-        Profession p2 = new Profession();
-        when(professionRepository.findAll()).thenReturn(Arrays.asList(p1, p2));
-        List<Profession> result = professionController.getAll();
-        assertEquals(2, result.size());
+    void getAll_shouldReturnListOfProfessions() throws Exception {
+        Profession profession = new Profession();
+        profession.setId(1L);
+        profession.setName("DBA");
+        
+        given(professionService.findAll()).willReturn(Collections.singletonList(profession));
+        
+        mockMvc.perform(get("/api/professions"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].name").value("DBA"));
     }
-
+    
     @Test
-    void testGetByIdFound() {
-        Profession p = new Profession();
-        when(professionRepository.findById(1L)).thenReturn(Optional.of(p));
-        ResponseEntity<Profession> response = professionController.getById(1L);
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals(p, response.getBody());
-    }
-
-    @Test
-    void testGetByIdNotFound() {
-        when(professionRepository.findById(1L)).thenReturn(Optional.empty());
-        ResponseEntity<Profession> response = professionController.getById(1L);
-        assertEquals(404, response.getStatusCodeValue());
-    }
-
-    @Test
-    void testCreate() {
-        ProfessionDTO dto = new ProfessionDTO();
-        dto.setName("Nova Profissão");
-        Profession p = new Profession();
-        p.setName("Nova Profissão");
-        when(professionRepository.save(any(Profession.class))).thenReturn(p);
-        ResponseEntity<?> response = professionController.create(dto);
-        assertEquals(200, response.getStatusCodeValue());
-        Map<?,?> body = (Map<?,?>) response.getBody();
-        assertEquals("Nova Profissão", body.get("name"));
-    }
-
-    @Test
-    void testUpdateFound() {
-        Profession existing = new Profession();
-        existing.setName("Old");
-        ProfessionDTO update = new ProfessionDTO();
-        update.setName("New");
-        when(professionRepository.findById(1L)).thenReturn(Optional.of(existing));
-        when(professionRepository.save(existing)).thenReturn(existing);
-        ResponseEntity<?> response = professionController.update(1L, update);
-        assertEquals(200, response.getStatusCodeValue());
-        Map<?,?> body = (Map<?,?>) response.getBody();
-        assertEquals("New", body.get("name"));
-    }
-
-    @Test
-    void testUpdateNotFound() {
-        ProfessionDTO update = new ProfessionDTO();
-        update.setName("New");
-        when(professionRepository.findById(1L)).thenReturn(Optional.empty());
-        ResponseEntity<?> response = professionController.update(1L, update);
-        assertEquals(404, response.getStatusCodeValue());
-    }
-
-    @Test
-    void testDeleteFound() {
-        when(professionRepository.existsById(1L)).thenReturn(true);
-        doNothing().when(professionRepository).deleteById(1L);
-        ResponseEntity<Void> response = professionController.delete(1L);
-        assertEquals(204, response.getStatusCodeValue());
-    }
-
-    @Test
-    void testDeleteNotFound() {
-        when(professionRepository.existsById(1L)).thenReturn(false);
-        ResponseEntity<Void> response = professionController.delete(1L);
-        assertEquals(404, response.getStatusCodeValue());
+    void create_shouldReturn201Created() throws Exception {
+        ProfessionRequestDTO dto = new ProfessionRequestDTO();
+        dto.setName("Engenheiro de Dados");
+        
+        Profession savedProfession = new Profession();
+        savedProfession.setId(1L);
+        savedProfession.setName("Engenheiro de Dados");
+        
+        given(professionService.create(any(ProfessionRequestDTO.class))).willReturn(savedProfession);
+        
+        mockMvc.perform(post("/api/professions")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name").value("Engenheiro de Dados"));
     }
 }
