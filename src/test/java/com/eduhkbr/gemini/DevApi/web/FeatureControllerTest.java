@@ -20,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 @WebMvcTest(FeatureController.class)
 class FeatureControllerTest {
@@ -58,6 +59,7 @@ class FeatureControllerTest {
         given(featureService.create(any(FeatureRequestDTO.class))).willReturn(returnedFeature);
 
         mockMvc.perform(post("/api/features")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
@@ -75,6 +77,7 @@ class FeatureControllerTest {
         dtoWithBlankName.setProfessionId(1L);
 
         mockMvc.perform(post("/api/features")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dtoWithBlankName)))
                 .andExpect(status().isBadRequest());
