@@ -3,6 +3,7 @@ package com.eduhkbr.gemini.DevApi.web;
 import com.eduhkbr.gemini.DevApi.model.Feature;
 import com.eduhkbr.gemini.DevApi.model.Profession;
 import com.eduhkbr.gemini.DevApi.service.FeatureService;
+import com.eduhkbr.gemini.DevApi.util.JwtUtil;
 import com.eduhkbr.gemini.DevApi.web.dto.FeatureRequestDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 @WebMvcTest(FeatureController.class)
 class FeatureControllerTest {
@@ -26,6 +28,12 @@ class FeatureControllerTest {
 
     @MockBean
     private FeatureService featureService;
+
+    @MockBean
+    private JwtUtil jwtUtil;
+
+    @MockBean
+    private UserDetailsService userDetailsService;
 
     @Autowired
     private ObjectMapper objectMapper;

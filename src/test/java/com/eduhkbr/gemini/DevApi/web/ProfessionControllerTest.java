@@ -3,6 +3,7 @@ package com.eduhkbr.gemini.DevApi.web;
 import com.eduhkbr.gemini.DevApi.model.Feature;
 import com.eduhkbr.gemini.DevApi.model.Profession;
 import com.eduhkbr.gemini.DevApi.service.ProfessionService;
+import com.eduhkbr.gemini.DevApi.util.JwtUtil;
 import com.eduhkbr.gemini.DevApi.web.dto.ProfessionRequestDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 @WebMvcTest(ProfessionController.class)
 class ProfessionControllerTest {
@@ -30,6 +32,12 @@ class ProfessionControllerTest {
 
     @MockBean
     private ProfessionService professionService;
+
+    @MockBean
+    private JwtUtil jwtUtil;
+
+    @MockBean
+    private UserDetailsService userDetailsService;
 
     @Autowired
     private ObjectMapper objectMapper;
