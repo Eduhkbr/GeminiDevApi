@@ -1,159 +1,135 @@
 # GeminiDevApi
 
-## Visão Geral
+**GeminiDevApi** é uma API inteligente e de alta performance construída com Java 21 e Spring Boot 3. Ela utiliza o LLM Gemini do Google para fornecer serviços avançados de análise de código, geração de documentação e engenharia de prompt guiada. O sistema foi projetado para escalabilidade e observabilidade, apresentando um sistema de cache multinível, persistência em banco de dados e integração com Prometheus para monitoramento.
 
-O GeminiDevApi é uma API Java baseada em Spring Boot para análise de código Java, geração automática de documentação e testes utilizando modelos de linguagem (LLM). O sistema utiliza cache, persistência em banco de dados e métricas customizadas para alta performance e observabilidade.
+## ✨ Funcionalidades Principais
 
----
+  - **🤖 Análise de Código com IA**: O endpoint `POST /v1/analyze` recebe código-fonte Java e gera automaticamente documentação técnica e esqueletos de testes JUnit 5.
+  - **📝 Geração de Prompt Guiada**: Um endpoint amigável `POST /v1/prompt-analyze` permite aos usuários selecionar um perfil profissional (ex: "Engenheiro de Software") e uma tarefa específica para gerar conteúdo especializado e de alta qualidade usando uma abordagem baseada em templates.
+  - **⚡️ Sistema de Cache Robusto**: Implementa uma estratégia de cache de dois níveis para minimizar chamadas à API do LLM, reduzir a latência e controlar custos. Utiliza um cache Caffeine em memória (L1) e um cache Redis distribuído (L2) para ambientes de produção.
+  - **🛡️ Autenticação Segura**: Possui um sistema de autenticação seguro usando JWT (JSON Web Tokens). O acesso aos endpoints é controlado por papéis (RBAC), distinguindo entre `USER` e `ADMIN`.
+  - **⚙️ Painel Administrativo**: Um painel front-end dedicado (`/admin.html`) fornece aos administradores funcionalidades completas de CRUD (Criar, Ler, Atualizar, Deletar) para gerenciar usuários, profissões e funcionalidades disponíveis no sistema de prompt guiado.
+  - **🔭 Observabilidade e Monitoramento**: Expõe métricas críticas da aplicação, incluindo métricas customizadas como `generation.cache.hits` e `generation.ia.calls`, através do endpoint `/actuator/prometheus` para fácil integração com Prometheus e outras ferramentas de monitoramento.
+  - **🐳 Ambiente Containerizado**: Acompanha um arquivo `docker-compose.yml` pré-configurado para uma configuração de desenvolvimento local transparente, iniciando a aplicação, Redis e Prometheus com um único comando.
+  - **🚀 Pipelines de CI/CD Automatizados**: Inclui workflows do GitHub Actions prontos para produção, para integração e implantação contínuas. Os pipelines automatizam testes, análise de qualidade de código (CodeQL, SonarCloud), construção de imagens Docker, envio para o Google Artifact Registry e implantação no Google Cloud Run.
 
-## Funcionalidades
-- **Análise de código Java**: Recebe classes Java e gera documentação e esqueleto de testes automaticamente via LLM.
-- **Cache e Persistência**: Evita chamadas desnecessárias ao LLM utilizando cache (Caffeine/Redis) e banco de dados.
-- **Métricas customizadas**: Exposição de métricas via Prometheus para monitoramento de uso de cache e chamadas à IA.
-- **Endpoints REST**: Interface HTTP para integração com outros sistemas.
+## 🛠️ Arquitetura e Tecnologias
 
----
+A aplicação segue um padrão de arquitetura em camadas (Controller, Service, Repository) para garantir a separação de responsabilidades e a manutenibilidade.
 
-## Arquitetura
+  - **Backend**: Java 21, Spring Boot 3.5.0, Spring Security (JWT), Spring Data JPA / Hibernate, WebFlux `WebClient`
+  - **Banco de Dados**: PostgreSQL (Produção), H2 (Desenvolvimento)
+  - **Cache**: Caffeine (L1 Cache), Redis (L2 Cache)
+  - **IA & LLM**: Google Gemini
+  - **DevOps & Implantação**: Docker, Docker Compose, GitHub Actions, Google Cloud Run, Google Artifact Registry
+  - **Observabilidade**: Micrometer, Prometheus
+  - **Testes**: JUnit 5, Mockito, Spring Boot Test
+  - **Frontend**: Vanilla JavaScript, HTML5, CSS3
 
-- **Spring Boot**: Framework principal para REST, DI e configuração.
-- **Camada de Serviço**: `JavaClassAnalyzerService` centraliza a lógica de análise, cache e persistência.
-- **Repositório**: `GenerationCacheRepository` gerencia o acesso ao banco de dados para cache de resultados.
-- **Configurações**: Beans para cache, métricas e integração com Prometheus.
-- **Testes**: Cobertura de unidade e integração usando JUnit e Mockito.
+## 🔌 Endpoints da API
 
----
+A API é protegida com JWT. Um token válido deve ser incluído como um Bearer Token no header `Authorization` para endpoints protegidos.
 
-## Endpoints Principais
+| Método | Endpoint                    | Descrição                                                                                               | Acesso        |
+| :----- | :-------------------------- | :-------------------------------------------------------------------------------------------------------- | :------------ |
+| `POST` | `/api/auth/login`           | Autentica um usuário e retorna um JWT.                                                         | Público       |
+| `POST` | `/v1/analyze`               | Analisa uma classe Java para gerar documentação e testes.                                      | `USER`, `ADMIN` |
+| `POST` | `/v1/prompt-analyze`        | Gera conteúdo com base em uma profissão, funcionalidade e descrição do usuário.                  | `USER`, `ADMIN` |
+| `GET`  | `/api/professions`          | Lista todas as profissões disponíveis e suas funcionalidades associadas.                        | `USER`, `ADMIN` |
+| `POST` | `/api/professions`          | Cria uma nova profissão.                                                                       | `ADMIN`       |
+| `GET`  | `/api/features`             | Lista todas as funcionalidades disponíveis.                                                    | `USER`, `ADMIN` |
+| `POST` | `/api/features`             | Cria uma nova funcionalidade e a associa a uma profissão.                                      | `ADMIN`       |
+| `GET`  | `/v1/cache`                 | Lista um resumo dos resultados de geração persistidos no cache do banco de dados.                | `USER`, `ADMIN` |
+| `GET`  | `/actuator/prometheus`      | Expõe métricas da aplicação e customizadas para o Prometheus.                                   | Público       |
+| `GET`  | `/swagger-ui.html`          | Fornece documentação interativa da API (Swagger UI).                                         | Público       |
 
-- `POST /v1/analyze` — Recebe uma lista de classes Java e retorna documentação e testes gerados.
-- `GET /actuator/prometheus` — Exposição de métricas customizadas para Prometheus.
-
----
-
-## Como Executar
+## 🚀 Como Começar
 
 ### Pré-requisitos
-- Java 21+
-- Maven 3.8+
-- Docker (opcional, para Redis/Prometheus)
 
-### Build e Execução
+  - Java JDK 21
+  - Apache Maven 3.9+
+  - Docker e Docker Compose
 
-```bash
-./mvnw clean package
-java -jar target/DevApi-0.0.2-SNAPSHOT.jar
-```
+### Configuração do Ambiente Local (Recomendado)
 
-### Ambiente de Desenvolvimento
+A maneira mais simples de executar toda a stack localmente é usando o Docker Compose.
 
-- Arquivo de configuração: `src/main/resources/application-dev.yml`
-- Para rodar dependências (Redis, Prometheus) via Docker Compose:
-- **Crie um arquivo `.env` na raiz do projeto** com as variáveis de ambiente necessárias para o serviço `geminidevapi` (exemplo: `SPRING_PROFILES_ACTIVE=dev`).
+1.  **Crie um Arquivo de Ambiente**:
+    Na raiz do projeto, crie um arquivo chamado `.env`. Este arquivo armazenará sua chave de API do Gemini e outras configurações.
 
-```bash
-docker-compose up -d
-```
+    ```dotenv
+    # Arquivo .env
+    SPRING_PROFILES_ACTIVE=dev
+    GEMINI_API_KEY=SUA_CHAVE_DE_API_GEMINI_AQUI
+    BASE_URL_IA=https://generativelanguage.googleapis.com/v1beta
+    MODEL_IA_NAME=gemini-1.5-flash
+    CORS_ALLOWED_ORIGINS=http://localhost:8080,http://127.0.0.1:8080
+    ```
 
----
+2.  **Build e Execução com Docker Compose**:
+    Abra um terminal na raiz do projeto e execute:
 
-## Docker e Ecossistema
+    ```bash
+    docker-compose up --build -d
+    ```
 
-O projeto já está pronto para rodar em containers Docker, facilitando o setup local e a integração com Redis e Prometheus.
+    Este comando irá construir a imagem Docker da aplicação e iniciar três containers: `geminidevapi-app`, `redis-dev` e `prometheus-dev`.
 
-### Build e Execução com Docker Compose
+3.  **Acesse os Serviços**:
 
-1. **Build e subida dos serviços:**
+      - **UI da Aplicação**: [http://localhost:8080/login.html](https://www.google.com/search?q=http://localhost:8080/login.html)
+      - **UI do Prometheus**: [http://localhost:9090](https://www.google.com/search?q=http://localhost:9090)
+      - **Redis (via cliente)**: `localhost:6379`
 
-```bash
-docker-compose up --build -d
-```
+### Exemplo de Uso
 
-2. **Acessos rápidos:**
-   - API: http://localhost:8080
-   - Prometheus: http://localhost:9090
-   - Redis: localhost:6379
+1.  **Login**:
+    Acesse a aplicação em [http://localhost:8080/login.html](https://www.google.com/search?q=http://localhost:8080/login.html). Use as credenciais padrão ou as que você adicionou para obter um JWT.
 
-3. **Parar os serviços:**
+2.  **Analisar Código via `curl`**:
+    Use o JWT obtido para fazer uma requisição ao endpoint `/v1/analyze`. O corpo da requisição deve ser um objeto JSON como mostrado em `payload.json`.
 
-```bash
-docker-compose down
-```
+    ```bash
+    # Substitua SEU_TOKEN_JWT pelo token do passo de login
+    TOKEN="SEU_TOKEN_JWT"
 
-### Estrutura dos Containers
+    curl -X POST http://localhost:8080/v1/analyze \
+       -H "Content-Type: application/json" \
+       -H "Authorization: Bearer $TOKEN" \
+       -d @payload.json
+    ```
 
-- **geminidevapi-app**: Container da aplicação Java (porta 8080)
-- **redis-dev**: Cache Redis (porta 6379)
-- **prometheus-dev**: Monitoramento Prometheus (porta 9090)
+## 🔬 Testes
 
-### Observabilidade
-- O Prometheus já está configurado para coletar métricas do endpoint `/actuator/prometheus` da aplicação.
-- O arquivo `prometheus.yml` pode ser customizado conforme necessidade.
+O projeto possui uma suíte de testes abrangente cobrindo testes unitários, de integração e da camada web.
 
-### Dicas
-- Para logs da aplicação: `docker logs -f geminidevapi-app`
-- Para acessar o shell do container: `docker exec -it geminidevapi-app sh`
-
----
-
-## Testes
-
-Execute todos os testes automatizados:
+Para executar todos os testes automatizados e gerar um relatório de cobertura, execute:
 
 ```bash
-./mvnw test
+./mvnw clean verify
 ```
 
----
+O relatório de cobertura do JaCoCo estará disponível em `target/site/jacoco/index.html`.
 
-## Métricas Disponíveis
-- `generation.cache.hits` — Total de hits no cache
-- `generation.ia.calls` — Total de chamadas ao LLM
+## 🔄 Pipelines de CI/CD
 
-Acesse via `/actuator/prometheus`.
+O projeto utiliza o GitHub Actions para seus workflows de CI/CD:
 
----
+  - **`pipelinedev.yml`**: Este workflow é acionado em pushes para a branch `develop`. Ele é responsável por:
 
-## Estrutura do Projeto
+      - Executar a análise do CodeQL para verificação de segurança.
+      - Executar todos os testes unitários e de integração.
+      - Gerar um relatório de cobertura de código com JaCoCo.
+      - Analisar o código com o SonarCloud para métricas de qualidade.
 
-```
-src/
-  main/java/com/eduhkbr/gemini/DevApi/
-    web/         # Controllers REST
-    service/     # Serviços de negócio
-    repository/  # Repositórios de dados
-    model/       # Modelos de domínio
-    config/      # Configurações Spring
-  resources/     # Configurações e templates
-  test/java/     # Testes automatizados
-```
+  - **`pipeline.yml`**: Este workflow é acionado em pushes para a branch `main` e lida com a implantação em produção:
 
----
-
-## Contribuição
-
-1. Fork este repositório
-2. Crie uma branch (`git checkout -b feature/nome-feature`)
-3. Commit suas alterações (`git commit -am 'feat: nova feature'`)
-4. Push para o branch (`git push origin feature/nome-feature`)
-5. Abra um Pull Request
-
----
+      - Executa o CodeQL e a suíte completa de testes/análises.
+      - Constrói uma imagem Docker da aplicação.
+      - Envia a imagem Docker para o Google Artifact Registry.
+      - Implanta a nova imagem no Google Cloud Run, aplicando todas as variáveis de ambiente necessárias a partir dos GitHub Secrets.
 
 ## Licença
 
-Este projeto está sob a licença MIT.
-
----
-
-## Exemplo de Requisição
-
-Para analisar uma ou mais classes Java, utilize o endpoint `/v1/analyze` conforme o exemplo abaixo:
-
-```bash
-curl -X POST http://localhost:8080/v1/analyze   -u user:b0948d42-977f-46e2-b1c4-e27234d16ad0   -H "Content-Type: application/json"   -d @payload.json
-```
-
-- Substitua o usuário e a senha pelo seu token de autenticação, se necessário.
-
----
+Este projeto está licenciado sob a Licença MIT. Veja o arquivo [LICENSE](https://opensource.org/licenses/MIT) para mais detalhes.
