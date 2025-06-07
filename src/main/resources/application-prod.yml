@@ -1,4 +1,7 @@
 spring:
+  config:
+    activate:
+      on-profile: prod
   application:
     name: DevApi
     
