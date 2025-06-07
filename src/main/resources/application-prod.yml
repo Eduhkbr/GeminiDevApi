@@ -1,21 +1,17 @@
 spring:
   application:
     name: DevApi
+    
   datasource:
-    url: jdbc:postgresql:///${DB_NAME}?cloudSqlInstance=${DEVAPI_DB_URL}&socketFactory=com.google.cloud.sql.postgres.SocketFactory&user=${DEVAPI_DB_USER}&password=${DEVAPI_DB_PASS}
-    driver-class-name: {$DEVAPI_DB_DRIVER}
+    url: jdbc:postgresql:///${DB_NAME}?cloudSqlInstance=${DEVAPI_DB_URL}&socketFactory=com.google.cloud.sql.postgres.SocketFactory&socketFactoryArg=
+    username: ${DEVAPI_DB_USER}
+    password: ${DEVAPI_DB_PASS}
     hikari:
-      jdbc-url: jdbc:postgresql:///${DB_NAME}
-      username: ${DEVAPI_DB_USER}
-      password: ${DEVAPI_DB_PASS}
       maximum-pool-size: 3
       minimum-idle: 1
-      idle-timeout: 60000
+      idle-timeout: 600000
       connection-timeout: 30000
-      max-lifetime: 180000
-      data-source-properties:
-        socketFactory: com.google.cloud.sql.postgres.SocketFactory
-        cloudSqlInstance: ${DEVAPI_DB_URL}
+      max-lifetime: 1800000
   jpa:
     hibernate:
       ddl-auto: none

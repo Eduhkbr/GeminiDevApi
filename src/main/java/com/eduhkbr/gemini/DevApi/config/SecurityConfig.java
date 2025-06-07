@@ -26,12 +26,13 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
-            .headers(headers -> headers.frameOptions(frame -> frame.disable())) // Necessário se usar H2-console ou UIs embutidas
+            .headers(headers -> headers.frameOptions(frame -> frame.disable()))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**", "/api/auth/login",
                     "/login.html", "/app.html", "/app.js", "/favicon.ico", "/css/**", "/js/**", "/static/**",
-                    "/h2-console/**", "/admin.html", "analise_**.html"
+                    "/h2-console/**", "/admin.html", "analise_**.html",
+                    "/actuator/**" 
                 ).permitAll()
                 .requestMatchers("/api/users/**").hasRole("ADMIN")
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/professions/**", "/api/features/**").hasAnyRole("ADMIN", "USER")

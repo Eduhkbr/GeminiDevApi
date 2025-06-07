@@ -1,0 +1,11 @@
+groups:
+  - name: GeneralAlerts
+    rules:
+      - alert: InstanceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: 'critical'
+        annotations:
+          summary: "Instância {{ $labels.instance }} está fora do ar"
+          description: "O job {{ $labels.job }} na instância {{ $labels.instance }} está fora do ar por mais de 1 minuto."
