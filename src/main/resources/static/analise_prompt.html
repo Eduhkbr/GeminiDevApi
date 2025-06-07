@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Gemini API - Análise de Prompt</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
+</head>
+<body>
+
+<header id="app-header"></header>
+
+<div class="container">
+
+    <h2>Análise de Prompt Guiado</h2>
+    <p>Selecione um perfil e descreva sua necessidade.</p>
+
+    <label for="professionSelect">Profissão:</label>
+    <select id="professionSelect"></select>
+
+    <label for="featureSelect">Funcionalidade:</label>
+    <select id="featureSelect"></select>
+
+    <label for="requestDescription">Descreva seu pedido:</label>
+    <textarea id="requestDescription" rows="4"></textarea>
+
+    <button id="promptAnalyzeBtn">Enviar para IA</button>
+    <div id="promptAnalyzeMsg"></div>
+
+    <h3>Resposta JSON</h3>
+    <pre id="promptAnalyzeResult"></pre>
+
+    <h3>Resposta Markdown</h3>
+    <div id="mdResultProf" class="markdown-body"></div>
+
+    <div class="history" id="historyBox">
+        <h4>Histórico de Requisições</h4>
+        <div id="historyList"></div>
+    </div>
+</div>
+<script src="js/auth.js"></script>
+<script src="js/analise_prompt.js"></script>
+</body>
+</html>

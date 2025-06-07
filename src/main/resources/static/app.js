@@ -90,28 +90,59 @@ function makeCollapsible(pre) {
 // Histórico de requisições
 function saveHistory(payloadObj, response) {
     let hist = JSON.parse(localStorage.getItem('analyzeHistory') || '[]');
-    hist.unshift({ name: payloadObj.name, sourceCode: payloadObj.sourceCode, response, date: new Date().toLocaleString() });
+
+    // Salvando professionSelect, featureSelect e requestDescription
+    hist.unshift({
+        profession: payloadObj.professionSelect,
+        feature: payloadObj.featureSelect,
+        requestDescription: payloadObj.requestDescription,
+        response,
+        date: new Date().toLocaleString()
+    });
+
+    // Mantém no máximo 10 itens
     if (hist.length > 10) hist = hist.slice(0, 10);
+
     localStorage.setItem('analyzeHistory', JSON.stringify(hist));
     renderHistory();
 }
+
 function renderHistory() {
     if (!historyList) return;
+
     let hist = JSON.parse(localStorage.getItem('analyzeHistory') || '[]');
     historyList.innerHTML = '';
+
     hist.forEach((item, idx) => {
         const div = document.createElement('div');
         div.className = 'history-item';
-        div.innerHTML = `<b>${item.date}</b><br><code>${item.name}</code>`;
+
+        // Exibe date e profession + feature
+        div.innerHTML = `
+            <b>${item.date}</b><br>
+            <code>${item.profession} ${item.feature}</code>
+        `;
+
         div.onclick = () => {
-            document.getElementById('className').value = item.name;
-            document.getElementById('classCode').value = item.sourceCode;
-            if (jsonResult) jsonResult.innerHTML = syntaxHighlight(JSON.parse(item.response));
+            // Preenche os dois selects
+            document.getElementById('professionSelect').value = item.profession;
+            document.getElementById('featureSelect').value = item.feature;
+
+            // Preenche a descrição do request
+            document.getElementById('requestDescription').value = item.requestDescription;
+
+            // Exibe o resultado formatado
+            if (jsonResult) {
+                jsonResult.innerHTML = syntaxHighlight(JSON.parse(item.response));
+            }
         };
+
         historyList.appendChild(div);
     });
 }
+
 renderHistory();
+
 
 if (analyzeBtn) {
     analyzeBtn.onclick = async () => {

@@ -31,9 +31,9 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**", "/api/auth/login",
                     "/login.html", "/app.html", "/app.js", "/favicon.ico", "/css/**", "/js/**", "/static/**",
-                    "/h2-console/**"
+                    "/h2-console/**", "/admin.html", "analise_**.html"
                 ).permitAll()
-                .requestMatchers("/admin.html", "/admin.js", "/api/users/**").hasRole("ADMIN")
+                .requestMatchers("/api/users/**").hasRole("ADMIN")
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/professions/**", "/api/features/**").hasAnyRole("ADMIN", "USER")
                 .requestMatchers("/api/professions/**", "/api/features/**").hasRole("ADMIN")
                 .anyRequest().authenticated()

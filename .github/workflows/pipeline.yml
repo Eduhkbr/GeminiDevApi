@@ -158,6 +158,7 @@ jobs:
             CORS_ALLOWED_ORIGINS=${{ secrets.CORS_ALLOWED_ORIGINS }}
             BASE_URL_IA=${{ secrets.BASE_URL_IA }}
             MODEL_IA_NAME=${{ secrets.MODEL_IA_NAME }}
+            GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
 
 #      - name: Validando a API
 #        run: 'curl "${{ steps.deploy.outputs.url }}"'

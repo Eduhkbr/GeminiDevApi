@@ -1,6 +1,9 @@
 package com.eduhkbr.gemini.DevApi.web;
 
 import com.eduhkbr.gemini.DevApi.exception.BusinessException;
+
+import jakarta.persistence.EntityNotFoundException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -19,6 +22,14 @@ import java.util.Map;
 @ControllerAdvice
 public class RestExceptionHandler {
 
+    /**
+     * Constrói o corpo da resposta de erro.
+     *
+     * @param error   Mensagem de erro.
+     * @param status  Status HTTP.
+     * @param request Requisição web, pode ser nula.
+     * @return Mapa contendo os detalhes do erro.
+     */
     private Map<String, Object> buildErrorBody(String error, HttpStatus status, WebRequest request) {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", Instant.now().toString());
@@ -37,6 +48,12 @@ public class RestExceptionHandler {
         Map<String, Object> body = buildErrorBody("Erro de validação", HttpStatus.BAD_REQUEST, request);
         body.put("fieldErrors", errors);
         return ResponseEntity.badRequest().body(body);
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleEntityNotFoundException(EntityNotFoundException ex, WebRequest request) {
+        Map<String, Object> body = buildErrorBody(ex.getMessage(), HttpStatus.NOT_FOUND, request);
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(BusinessException.class)

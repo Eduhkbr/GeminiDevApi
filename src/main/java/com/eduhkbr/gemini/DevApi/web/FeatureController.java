@@ -1,81 +1,50 @@
 package com.eduhkbr.gemini.DevApi.web;
 
 import com.eduhkbr.gemini.DevApi.model.Feature;
-import com.eduhkbr.gemini.DevApi.repository.FeatureRepository;
-import com.eduhkbr.gemini.DevApi.web.dto.FeatureDTO;
-import com.eduhkbr.gemini.DevApi.model.Profession;
-import com.eduhkbr.gemini.DevApi.repository.ProfessionRepository;
+import com.eduhkbr.gemini.DevApi.service.FeatureService;
+import com.eduhkbr.gemini.DevApi.web.dto.FeatureRequestDTO;
+import com.eduhkbr.gemini.DevApi.web.dto.FeatureResponseDTO;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/features")
 public class FeatureController {
-    private final FeatureRepository featureRepository;
-    private final ProfessionRepository professionRepository;
-    public FeatureController(FeatureRepository featureRepository, ProfessionRepository professionRepository) {
-        this.featureRepository = featureRepository;
-        this.professionRepository = professionRepository;
+
+    private final FeatureService featureService;
+
+    public FeatureController(FeatureService featureService) {
+        this.featureService = featureService;
     }
 
     @GetMapping
-    public List<Feature> getAll() {
-        return featureRepository.findAll();
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Feature> getById(@PathVariable Long id) {
-        return featureRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<List<FeatureResponseDTO>> getAll() {
+        List<FeatureResponseDTO> features = featureService.findAll().stream()
+                .map(FeatureResponseDTO::fromEntity)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(features);
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@Valid @RequestBody FeatureDTO dto) {
-        String safeName = dto.getName().replaceAll("[<>\"'\\\\]", "");
-        if (safeName.isBlank()) return ResponseEntity.badRequest().body("Nome inválido");
-        Profession profession = null;
-        if (dto.getProfessionId() != null) {
-            profession = professionRepository.findById(dto.getProfessionId()).orElse(null);
-            if (profession == null) return ResponseEntity.badRequest().body("Profissão não encontrada");
-        }
-        Feature feature = new Feature();
-        feature.setName(safeName);
-        feature.setProfession(profession);
-        Feature saved = featureRepository.save(feature);
-        Long id = saved.getId() != null ? saved.getId() : -1L;
-        String name = saved.getName() != null ? saved.getName() : "";
-        return ResponseEntity.ok(Map.of("id", id, "name", name));
+    public ResponseEntity<FeatureResponseDTO> create(@Valid @RequestBody FeatureRequestDTO dto) {
+        Feature savedFeature = featureService.create(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(FeatureResponseDTO.fromEntity(savedFeature));
     }
-
+    
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody FeatureDTO dto) {
-        return featureRepository.findById(id)
-                .map(existing -> {
-                    String safeName = dto.getName().replaceAll("[<>\"'\\\\]", "");
-                    if (safeName.isBlank()) return ResponseEntity.badRequest().body("Nome inválido");
-                    Profession profession = null;
-                    if (dto.getProfessionId() != null) {
-                        profession = professionRepository.findById(dto.getProfessionId()).orElse(null);
-                        if (profession == null) return ResponseEntity.badRequest().body("Profissão não encontrada");
-                    }
-                    existing.setName(safeName);
-                    existing.setProfession(profession);
-                    Feature saved = featureRepository.save(existing);
-                    Long retId = saved.getId() != null ? saved.getId() : -1L;
-                    String retName = saved.getName() != null ? saved.getName() : "";
-                    return ResponseEntity.ok(Map.of("id", retId, "name", retName));
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<FeatureResponseDTO> update(@PathVariable Long id, @Valid @RequestBody FeatureRequestDTO dto) {
+        Feature updatedFeature = featureService.update(id, dto);
+        return ResponseEntity.ok(FeatureResponseDTO.fromEntity(updatedFeature));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        if (!featureRepository.existsById(id)) return ResponseEntity.notFound().build();
-        featureRepository.deleteById(id);
+        featureService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }
