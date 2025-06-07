@@ -9,7 +9,7 @@
   - **⚡️ Sistema de Cache Robusto**: Implementa uma estratégia de cache de dois níveis para minimizar chamadas à API do LLM, reduzir a latência e controlar custos. Utiliza um cache Caffeine em memória (L1) e um cache Redis distribuído (L2) para ambientes de produção.
   - **🛡️ Autenticação Segura**: Possui um sistema de autenticação seguro usando JWT (JSON Web Tokens). O acesso aos endpoints é controlado por papéis (RBAC), distinguindo entre `USER` e `ADMIN`.
   - **⚙️ Painel Administrativo**: Um painel front-end dedicado (`/admin.html`) fornece aos administradores funcionalidades completas de CRUD (Criar, Ler, Atualizar, Deletar) para gerenciar usuários, profissões e funcionalidades disponíveis no sistema de prompt guiado.
-  - **🔭 Observabilidade e Monitoramento**: Expõe métricas críticas da aplicação, incluindo métricas customizadas como `generation.cache.hits` e `generation.ia.calls`, através do endpoint `/actuator/prometheus` para fácil integração com Prometheus e outras ferramentas de monitoramento.
+  - **🔭 Observabilidade e Monitoramento**: Ambiente local pré-configurado com Prometheus, Grafana e Alertmanager, incluindo um dashboard detalhado para análise de performance da JVM, pool de conexões do banco de dados, requisições HTTP e métricas de negócio customizadas.
   - **🐳 Ambiente Containerizado**: Acompanha um arquivo `docker-compose.yml` pré-configurado para uma configuração de desenvolvimento local transparente, iniciando a aplicação, Redis e Prometheus com um único comando.
   - **🚀 Pipelines de CI/CD Automatizados**: Inclui workflows do GitHub Actions prontos para produção, para integração e implantação contínuas. Os pipelines automatizam testes, análise de qualidade de código (CodeQL, SonarCloud), construção de imagens Docker, envio para o Google Artifact Registry e implantação no Google Cloud Run.
 
@@ -22,9 +22,24 @@ A aplicação segue um padrão de arquitetura em camadas (Controller, Service, R
   - **Cache**: Caffeine (L1 Cache), Redis (L2 Cache)
   - **IA & LLM**: Google Gemini
   - **DevOps & Implantação**: Docker, Docker Compose, GitHub Actions, Google Cloud Run, Google Artifact Registry
-  - **Observabilidade**: Micrometer, Prometheus
+  - **Observabilidade**: Micrometer, Prometheus, Grafana, Alertmanager.
   - **Testes**: JUnit 5, Mockito, Spring Boot Test
   - **Frontend**: Vanilla JavaScript, HTML5, CSS3
+
+## 🔭 Observabilidade e Monitoramento
+
+O projeto adota uma abordagem de "Infraestrutura como Código" para o monitoramento, garantindo que todo o setup seja versionado e replicável. A stack de monitoramento é iniciada junto com a aplicação via `docker-compose`.
+
+  - **Prometheus** ([http://localhost:9090](https://www.google.com/search?q=http://localhost:9090)): Coleta e armazena as métricas.
+  - **Grafana** ([http://localhost:3000](https://www.google.com/search?q=http://localhost:3000)): Visualiza as métricas em um dashboard pré-configurado. Login padrão: `admin` / `admin`.
+  - **Alertmanager** ([http://localhost:9093](https://www.google.com/search?q=http://localhost:9093)): Gerencia os alertas definidos no Prometheus.
+
+O dashboard padrão, definido em `/dashboards/api_dashboard.json`, inclui painéis para:
+
+  - **KPIs:** Uptime, Uso de CPU, e contadores de negócio.
+  - **Requisições HTTP:** Taxa de requisições e latência (p95).
+  - **Saúde da JVM:** Uso de memória Heap e Non-Heap, e contagem de Threads.
+  - **Pool de Conexões do Banco de Dados:** Conexões ativas, ociosas, pendentes e total de timeouts.
 
 ## 🔌 Endpoints da API
 
@@ -78,8 +93,10 @@ A maneira mais simples de executar toda a stack localmente é usando o Docker Co
 
 3.  **Acesse os Serviços**:
 
-      - **UI da Aplicação**: [http://localhost:8080/login.html](https://www.google.com/search?q=http://localhost:8080/login.html)
-      - **UI do Prometheus**: [http://localhost:9090](https://www.google.com/search?q=http://localhost:9090)
+      - **UI da Aplicação**: `http://localhost:8080/login.html`
+      - **Grafana Dashboard**: `http://localhost:3000`
+      - **Prometheus UI**: `http://localhost:9090`
+      - **Alertmanager UI**: `http://localhost:9093`
       - **Redis (via cliente)**: `localhost:6379`
 
 ### Exemplo de Uso
