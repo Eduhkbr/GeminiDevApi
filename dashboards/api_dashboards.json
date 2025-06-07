@@ -1,0 +1,195 @@
+{
+  "__inputs": [],
+  "__requires": [],
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Uptime",
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus" },
+      "pluginVersion": "10.2.2",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "process_uptime_seconds{job=\"spring-actuator\"}",
+          "instant": true,
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" } }
+    },
+    {
+      "type": "gauge",
+      "title": "Uso de CPU do Processo",
+      "gridPos": { "h": 8, "w": 8, "x": 4, "y": 0 },
+      "datasource": { "type": "prometheus" },
+      "pluginVersion": "10.2.2",
+      "targets": [
+        { "refId": "A", "expr": "process_cpu_usage{job=\"spring-actuator\"} * 100" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100 } }
+    },
+    {
+      "type": "stat",
+      "title": "Chamadas à IA (total)",
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus" },
+      "pluginVersion": "10.2.2",
+      "targets": [
+        { "refId": "A", "expr": "generation_ia_calls_total" }
+      ],
+      "reduceOptions": { "calcs": [ "last" ] }
+    },
+    {
+      "type": "stat",
+      "title": "Acertos no Cache (total)",
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "datasource": { "type": "prometheus" },
+      "pluginVersion": "10.2.2",
+      "targets": [
+        { "refId": "A", "expr": "generation_cache_hits_total" }
+      ],
+      "reduceOptions": { "calcs": [ "last" ] }
+    },
+    {
+      "type": "timeseries",
+      "title": "Taxa de Requisições HTTP (5m)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "datasource": { "type": "prometheus" },
+      "pluginVersion": "10.2.2",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(http_server_requests_seconds_count{job=\"spring-actuator\"}[5m])) by (uri, outcome)"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps" } }
+    },
+    {
+      "type": "timeseries",
+      "title": "Latência de Resposta (p95)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "datasource": { "type": "prometheus" },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket[5m])) by (le, uri))",
+          "legendFormat": "{{uri}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" } }
+    },
+    {
+      "type": "timeseries",
+      "title": "Memória JVM (Heap vs Non-Heap)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "datasource": { "type": "prometheus" },
+      "pluginVersion": "10.2.2",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(jvm_memory_used_bytes{area=\"heap\", job=\"spring-actuator\"})",
+          "legendFormat": "Heap Usada"
+        },
+        {
+          "refId": "B",
+          "expr": "sum(jvm_memory_used_bytes{area=\"nonheap\", job=\"spring-actuator\"})",
+          "legendFormat": "Non-Heap Usada"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "bytes" } }
+    },
+    {
+      "type": "timeseries",
+      "title": "Threads da JVM",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "datasource": { "type": "prometheus" },
+      "pluginVersion": "10.2.2",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "jvm_threads_live_threads{job=\"spring-actuator\"}",
+          "legendFormat": "Ativas"
+        },
+        {
+          "refId": "B",
+          "expr": "jvm_threads_daemon_threads{job=\"spring-actuator\"}",
+          "legendFormat": "Daemon"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "short" } }
+    },
+    {
+      "type": "timeseries",
+      "title": "Pool de Conexões DB - Uso",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
+      "datasource": { "type": "prometheus" },
+      "targets": [
+        {
+          "expr": "hikaricp_connections_active{job=\"spring-actuator\"}",
+          "legendFormat": "Ativas",
+          "refId": "A"
+        },
+        {
+          "expr": "hikaricp_connections_idle{job=\"spring-actuator\"}",
+          "legendFormat": "Ociosas (Idle)",
+          "refId": "B"
+        },
+        {
+          "expr": "hikaricp_connections_pending{job=\"spring-actuator\"}",
+          "legendFormat": "Aguardando (Pending)",
+          "refId": "C"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "short" } }
+    },
+    {
+      "type": "stat",
+      "title": "Timeouts do Pool de Conexões",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 },
+      "datasource": { "type": "prometheus" },
+      "targets": [
+        {
+          "expr": "hikaricp_connections_timeout_total{job=\"spring-actuator\"}",
+          "legendFormat": "Total de Timeouts",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          },
+          "unit": "short"
+        }
+      },
+      "options": {
+        "reduceOptions": { "calcs": [ "last" ] },
+        "orientation": "auto"
+      }
+    }
+  ],
+  "schemaVersion": 37,
+  "style": "dark",
+  "tags": [],
+  "templating": { "list": [] },
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "API GeminiDevApi Dashboard",
+  "uid": "my-api-dashboard",
+  "version": 3
+}
